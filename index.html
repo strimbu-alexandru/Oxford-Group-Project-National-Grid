@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>National Grid App Thingy</title>
+
+	<style>
+	#custom{ 
+    	display: none;
+	}
+</style>
+<script type="text/javascript">
+	var options =[{"text"  : "iPhone","value" : "iPhone", "power": "30", "minutes": "120"},
+  		{"text"     : "Android","value"    : "Android",	"power":"70", "minutes":"300"},
+  		{"text"  : "Custom","value" : "Custom", "power":"0", "minutes":"0"}
+		];
+
+	function setupForm(){
+		document.getElementById("power").value = options[0].power;
+		document.getElementById("timeMin").value = options[0].minutes;
+	}
+
+	function setSelect() {
+	selectField = document.getElementById("devform");
+	selectField.options.length = 0;
+	for (i=0; i<options.length; i++) 
+	{
+	selectField.options[selectField.length] = new Option(options[i].text, options[i].value);
+	}
+	}
+
+
+	function deviceType(){
+		var xcustom = document.getElementById("custom");
+		index = document.getElementById("devform").options.selectedIndex;
+		document.getElementById("power").value = options[index].power;
+		document.getElementById("timeMin").value = options[index].minutes;
+		if(index === document.getElementById("devform").options.length - 1)
+			xcustom.style.display = "block";
+		else 
+			xcustom.style.display = "none";
+	}
+
+</script>
+</head>
+<body onload="setSelect(), setupForm()">
+
+<form name = "devtype" id = "devtype"> 
+	<label>Choose your device type:</label>
+	<select style="width:auto;" name="devform" id="devform" onchange="deviceType()">
+	<option value="">Device type</option>
+	</select>
+</form>
+
+
+
+<!-- Send data to backend -->
+
+
+
+<form action = "http://127.0.0.1:5000/" method="get">
+	<div id = "custom">
+	<div>
+		<label for="power"> Power of your device (W): </label>
+		<input type = "text" name="power" id = "power">
+	</div>
+	<div>
+		<label for="timeMin"> Intended usage of device (in minutes): </label>
+		<input type = "text" name="timeMin" id="timeMin">
+	</div>
+	</div>
+	<div>
+		<button>Send data.</button>
+	</div>
+</form>
+
+
+
+
+<!--<script src="scripts/main.js"></script>-->
+</body>
+</html>
