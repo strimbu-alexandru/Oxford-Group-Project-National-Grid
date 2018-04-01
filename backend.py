@@ -6,9 +6,12 @@ import time
 from flask import Flask, render_template
 from flask import request, jsonify
 from flask_restful import Resource, Api
+from Auth import Auth
 
 app = Flask(__name__)
 api = Api(app)
+
+app.register_blueprint(Auth)
 
 headers = {
   'Accept': 'application/json'
