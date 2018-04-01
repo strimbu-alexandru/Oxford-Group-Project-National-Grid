@@ -11,7 +11,7 @@ from Auth import Auth
 app = Flask(__name__)
 api = Api(app)
 
-api.register_blueprint(Auth)
+app.register_blueprint(Auth)
 
 headers = {
   'Accept': 'application/json'
