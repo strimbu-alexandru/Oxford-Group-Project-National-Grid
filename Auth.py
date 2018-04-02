@@ -4,7 +4,7 @@ from google.oauth2 import id_token, credentials
 from google.auth.transport import requests
 
 # Declare blueprint:
-Auth = Blueprint('Auth',__name__, url_prefix='/auth', template_folder='modules/templates')
+Auth = Blueprint('Auth',__name__, url_prefix='/auth', template_folder='templates')
 
 CLIENT_ID = '395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleusercontent.com'	#team10 account
 
