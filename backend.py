@@ -2,16 +2,22 @@ import requests
 import json
 import datetime
 import time
+import string
 
 from flask import Flask, render_template
 from flask import request, jsonify
 from flask_restful import Resource, Api
 from Auth import Auth
+from random import *
 
 app = Flask(__name__)
 api = Api(app)
 
 app.register_blueprint(Auth)
+
+# randomly generate the secret key for user sessions:
+allchar = string.ascii_letters + string.punctuation + string.digits
+app.secret_key  = "".join(choice(allchar) for x in range(32))
 
 headers = {
   'Accept': 'application/json'
