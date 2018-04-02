@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Login </title>
+		<meta name="google-signin-client_id" content="395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleusercontent.com">
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+		<script type="text/javascript">
+			function onSignIn(googleUser) {
+				// prod
+				var loginHandler = 'http://team10.pythonanywhere.com/auth/login'
+				// test
+//				var loginHandler = 'http://localhost:5000/auth/login'
+
+				var profile = googleUser.getBasicProfile();
+				console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+				console.log('Name: ' + profile.getName());
+				console.log('Image URL: ' + profile.getImageUrl());
+				console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+				var id_token = googleUser.getAuthResponse().id_token;
+
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', loginHandler, true);
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.onload = function() {
+				  console.log('Signed in as: ' + xhr.responseText);
+				};
+				xhr.send('idtoken=' + id_token);
+			}
+
+		 	function signOut() {
+		 		// prod
+				var logoutHandler = 'http://team10.pythonanywhere.com/auth/logout'
+				// test
+//				var logoutHandler = 'http://localhost:5000/auth/logout'
+
+				var auth2 = gapi.auth2.getAuthInstance();
+				auth2.signOut().then(function () {
+					console.log('User signed out.');
+				});
+
+				// tell server to sign user out
+				var xhr = new XMLHttpRequest();
+				xhr.open('get', logoutHandler);
+				xhr.onload = function() {
+				  console.log(xhr.responseText);
+				};
+				xhr.send();
+			}
+		</script>
+	</head>
+
+	<body>
+		<div style="text-align: center; padding: 2%;">
+			<p>Sign in with google:</p>
+			<div class="g-signin2" data-onsuccess="onSignIn" style="display: inline-block;"></div>
+			<br>
+			<a href="#" onclick="signOut();">Sign out</a>
+		</div>
+	</body>
+</html>
+
