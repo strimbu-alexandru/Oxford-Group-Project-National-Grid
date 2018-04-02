@@ -1,6 +1,6 @@
 import requests
 from flask import Flask, url_for, request, render_template, session, escape, redirect, Blueprint
-from google.oauth2 import id_token, credentials
+from google.oauth2 import id_token
 from google.auth.transport import requests
 
 # Declare blueprint:
