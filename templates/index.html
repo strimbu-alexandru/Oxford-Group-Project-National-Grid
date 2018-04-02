@@ -1,81 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang = "en">
 <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 	<title>National Grid App Thingy</title>
 
-	<style>
-	#custom{ 
-    	display: none;
-	}
-</style>
+	<!-- bootstrap -->
+	<link href = "bootstrap-4.0.0/dist/css/bootstrap.min.css" rel = "stylesheet">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
 	var options =[{"text"  : "iPhone","value" : "iPhone", "power": "30", "minutes": "120"},
   		{"text"     : "Android","value"    : "Android",	"power":"70", "minutes":"300"},
   		{"text"  : "Custom","value" : "Custom", "power":"0", "minutes":"0"}
 		];
 
-	function setupForm(){
-		document.getElementById("power").value = options[0].power;
-		document.getElementById("timeMin").value = options[0].minutes;
-	}
 
-	function setSelect() {
-	selectField = document.getElementById("devform");
-	selectField.options.length = 0;
-	for (i=0; i<options.length; i++) 
-	{
-	selectField.options[selectField.length] = new Option(options[i].text, options[i].value);
-	}
-	}
+	function formsubmit(p, m){
 
+    	$.ajax('http://team10.pythonanywhere.com/server/best24h/'+p+'/'+m);
 
-	function deviceType(){
-		var xcustom = document.getElementById("custom");
-		index = document.getElementById("devform").options.selectedIndex;
-		document.getElementById("power").value = options[index].power;
-		document.getElementById("timeMin").value = options[index].minutes;
-		if(index === document.getElementById("devform").options.length - 1)
-			xcustom.style.display = "block";
-		else 
-			xcustom.style.display = "none";
 	}
 
 </script>
 </head>
-<body onload="setSelect(), setupForm()">
+<body>
 
-<form name = "devtype" id = "devtype"> 
-	<label>Choose your device type:</label>
-	<select style="width:auto;" name="devform" id="devform" onchange="deviceType()">
-	<option value="">Device type</option>
-	</select>
-</form>
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+      <h1 class="display-4">Schedule a device</h1>
+      <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
+ </div>
 
-
-
-<!-- Send data to backend -->
-
-
-
-<form action = "http://team10.pythonanywhere.com/server/best24h" method="get">
-	<div id = "custom">
-	<div>
-		<label for="power"> Power of your device (W): </label>
-		<input type = "text" name="power" id = "power">
+<div class = "container">
+<div class = "card-deck">
+	<!-- Card 1 -->
+	<div class = "card">
+		<div class = "card-body">
+			<img class = "card-img-top img-fluid" src = "assets/appleico.png">
+			<h5 class = "card-title text-center"> Template 1</h5>
+			<button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit(options[0].power, options[0].minutes)"> Schedule</button>
+		</div>
 	</div>
-	<div>
-		<label for="timeMin"> Intended usage of device (in minutes): </label>
-		<input type = "text" name="timeMin" id="timeMin">
+	<!-- Card 2 -->
+	<div class = "card">
+		<div class = "card-body">
+			<img class = "card-img-top img-fluid" src = "assets/androidico.png" >
+			<h5 class = "card-title text-center"> Template 2</h5>
+			<button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit(options[1].power, options[1].minutes)"> Schedule</button>
+		</div>
 	</div>
+	<!-- Card 3 -->
+	<div class = "card">
+		<div class = "card-body ">
+			<img class = "card-img-top img-fluid" src = "assets/custom.png" >
+			<h5 class = "card-title text-center"> Custom</h5>
+			<form id = "custdata">
+				<div class = "form-group">
+					<label for="inputPower"> Power </label>
+					<input type="text" class = "form-control" id="inputPower" placeholder="Enter power (kWh)">
+					<label for="inputMinutes"> Minutes required to charge </label>
+					<input type="text" class = "form-control" id="inputMinutes" placeholder="Enter minutes">
+ 				</div>
+			</form>
+			<button type = "button" 
+				class = "btn btn-lg btn-block btn-outline-primary"
+				onclick = "formsubmit (document.getElementById('inputPower').value, document.getElementById('inputMinutes').value)"> Schedule</button>
+		</div>
 	</div>
-	<div>
-		<button>Send data.</button>
-	</div>
-</form>
-
-
-
-
-<!--<script src="scripts/main.js"></script>-->
+</div>
+</div>
 </body>
 </html>
