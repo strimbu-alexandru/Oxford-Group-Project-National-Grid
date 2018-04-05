@@ -6,12 +6,9 @@
 		<script src="https://apis.google.com/js/platform.js" async defer></script>
 		<script type="text/javascript">
 			function onSignIn(googleUser) {
-				// prod
 				var loginHandler = 'http://team10.pythonanywhere.com/auth/login'
-				// test
-//				var loginHandler = 'http://localhost:5000/auth/login'
-
 				var profile = googleUser.getBasicProfile();
+				
 				console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
 				console.log('Name: ' + profile.getName());
 				console.log('Image URL: ' + profile.getImageUrl());
@@ -23,16 +20,13 @@
 				xhr.open('POST', loginHandler, true);
 				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 				xhr.onload = function() {
-				  console.log('Signed in as: ' + xhr.responseText);
+					console.log(xhr.responseText);
 				};
 				xhr.send('idtoken=' + id_token);
 			}
 
 		 	function signOut() {
-		 		// prod
 				var logoutHandler = 'http://team10.pythonanywhere.com/auth/logout'
-				// test
-//				var logoutHandler = 'http://localhost:5000/auth/logout'
 
 				var auth2 = gapi.auth2.getAuthInstance();
 				auth2.signOut().then(function () {
@@ -41,7 +35,7 @@
 
 				// tell server to sign user out
 				var xhr = new XMLHttpRequest();
-				xhr.open('get', logoutHandler);
+				xhr.open('GET', logoutHandler);
 				xhr.onload = function() {
 				  console.log(xhr.responseText);
 				};
