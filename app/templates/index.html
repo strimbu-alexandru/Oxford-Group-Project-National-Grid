@@ -21,7 +21,7 @@
 
     	$.ajax('http://team10.pythonanywhere.com/server/best24h/'+p+'/'+m, {success: function(data) {console.log(data.data[2]);
     		document.getElementById('titletext').style.display = "none";
-    		document.getElementById('container').innerHTML = "<div class ='thumbnail text-center'> <img src = 'assets/clockscheduler.png' alt='' class='img-responsive'> <div class='caption'><h4 class = 'text-center'>You should plug your device in at <br>" + data.data[2].plugInTime + "</h4></div></div>";}});
+    		document.getElementById('container').innerHTML = "<div class ='thumbnail text-center'> <img src = "{{url_for('.static', filename='clockscheduler.png')}}" alt='' class='img-responsive'> <div class='caption'><h4 class = 'text-center'>You should plug your device in at <br>" + data.data[2].plugInTime + "</h4></div></div>";}});
 	}
 
 </script>
@@ -52,7 +52,7 @@
 	<!-- Card 1 -->
 	<div class = "card">
 		<div class = "card-body">
-			<img class = "card-img-top img-fluid" src = "assets/appleico.png">
+			<img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='appleico.png')}}">
 			<h5 class = "card-title text-center"> Template 1</h5>
 			<button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit(options[0].power, options[0].minutes)"> Schedule</button>
 		</div>
@@ -60,7 +60,7 @@
 	<!-- Card 2 -->
 	<div class = "card">
 		<div class = "card-body">
-			<img class = "card-img-top img-fluid" src = "assets/androidico.png" >
+			<img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='androidico.png')}}">
 			<h5 class = "card-title text-center"> Template 2</h5>
 			<button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit(options[1].power, options[1].minutes)"> Schedule</button>
 		</div>
@@ -68,7 +68,7 @@
 	<!-- Card 3 -->
 	<div class = "card">
 		<div class = "card-body ">
-			<img class = "card-img-top img-fluid" src = "assets/custom.png" >
+			<img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='custom.png')}}">
 			<h5 class = "card-title text-center"> Custom</h5>
 			<form id = "custdata">
 				<div class = "form-group">
