@@ -26,7 +26,7 @@
 
 	function formsubmit(p, m){
 
-    	$.ajax('http://team10.pythonanywhere.com/server/best24h/'+p+'/'+m, {
+    	$.ajax('./server/best24h/'+p+'/'+m, {
     		success: function(data) {
     			writeschedule(data, m)
     		}
