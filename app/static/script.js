@@ -60,7 +60,7 @@ function formsubmit(p, m){
 
 function writeschedule(data, m){
     //Calculate length of single charge
-    var hours = m/60;
+    var hours = m/60;var mins = m%60;
     var plugDate =data.data[2].plugInTime;
     plugDate = plugDate.split("T").pop();
     plugDate = plugDate.substring(0,plugDate.length-1);
