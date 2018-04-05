@@ -77,14 +77,32 @@
     	document.getElementById('titletext').style.display = "none";
 
     	var hours = m/60;
-    	var numberCharging = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1];
+    	var plugDate =data.data[2].plugInTime;
+    	plugDate = plugDate.split("T").pop();
+    	plugDate = plugDate.substring(0,plugDate.length-1);
+    	var plugDateShort = plugDate.split(":")[0];
+    	if(plugDateShort >= 12)
+    		plugDateShort = plugDateShort - 12;
+
+    	var numberCharging = [];
     	var backgroundColors = [];
+
+    	//fakes numberCharging, I hope to get this from db
+    	for(var i = 0; i<12; i++){
+    		if(i < plugDateShort)
+    			numberCharging.push(0);
+    		else
+    			numberCharging.push(1);
+    	}
+
     	for(var i = 0; i<12; i++){
     		if(numberCharging[i]<1)
     			backgroundColors.push('gray');
     		else
     			backgroundColors.push('green');
     	}
+
+
 
     	document.getElementById('container').innerHTML = "<canvas id='schedulerchart' width='600' height='600'></canvas>";
     	var ctx = document.getElementById('schedulerchart');
@@ -113,6 +131,14 @@
     							else
     								text = ' devices charging at this time.';
     							return number + text;
+    						},
+    						afterLabel: function(tooltipItem, data){
+    							var text = '';
+    							if(tooltipItem.index == plugDateShort){
+    								text = "Plug in your device at ";
+    								text = text + plugDate + ".";
+    							}
+    							return text;
     						}
     				}
     			},
