@@ -73,19 +73,20 @@ function writeschedule(data, m){
     var backgroundColors = [];
 
     //fakes numberCharging, I hope to get this from db
-    for(var i = 0; i<12; i++){
-        if(i >= plugDateShort && i <= unplugShort)
-            numberCharging.push(0);
-        else
-            numberCharging.push(1);
-    }
+    for(var i = 0; i<24; i++){
+    		if(i >= plugDateShort && i <= unplugShort)
+    			numberCharging.push(1);
+    		else
+    			numberCharging.push(0);
+    	}
 
-    for(var i = 0; i<12; i++){
-        if(numberCharging[i]<1)
-            backgroundColors.push('gray');
-        else
-            backgroundColors.push('green');
-    }
+    	for(var i = 0; i<24; i++){
+    		if(numberCharging[i]<1)
+    			backgroundColors.push('gray');
+    		else
+    			backgroundColors.push('green');
+    	}
+
 
 
     $('#resultsModal').modal('show');
