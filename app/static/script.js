@@ -59,22 +59,22 @@ function formsubmit(p, m){
 
 
 function writeschedule(data, m){
-    document.getElementById('titletext').style.display = "none";
-
+    //Calculate length of single charge
     var hours = m/60;
     var plugDate =data.data[2].plugInTime;
     plugDate = plugDate.split("T").pop();
     plugDate = plugDate.substring(0,plugDate.length-1);
     var plugDateShort = plugDate.split(":")[0];
-    if(plugDateShort >= 12)
-        plugDateShort = plugDateShort - 12;
+    var plugDateMins = plugDate.split(":")[1];
+
+    var unplugShort = plugDateShort*1 + hours*1 + (1*plugDateMins + 1*mins)/60;
 
     var numberCharging = [];
     var backgroundColors = [];
 
     //fakes numberCharging, I hope to get this from db
     for(var i = 0; i<12; i++){
-        if(i < plugDateShort || i > plugDateShort + hours)
+        if(i >= plugDateShort && i <= unplugShort)
             numberCharging.push(0);
         else
             numberCharging.push(1);
@@ -88,69 +88,73 @@ function writeschedule(data, m){
     }
 
 
-
-    document.getElementById('container').innerHTML = "<canvas id='schedulerchart' width='600' height='600'></canvas>";
+    $('#resultsModal').modal('show');
 
     var ctx = document.getElementById('schedulerchart');
-    var schChart = new Chart(ctx,{
-        type: 'doughnut',
-        data: {
-            labels: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00'],
-            datasets: [{
-                label: '',
-                data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                backgroundColor: backgroundColors
-            }
-            ]
-        },
-        options: {
-            tooltips: {
-                callbacks: {
-                        title: function(tooltipItem, data){
-                            return data['labels'][tooltipItem[0]['index']];
-                        },
-                        label: function(tooltipItem, data){
-                            var number = numberCharging[tooltipItem.index];
-                            var text;
-                            if(number == 1)
-                                text = ' device charging at this time.';
-                            else
-                                text = ' devices charging at this time.';
-                            return number + text;
-                        },
-                        afterLabel: function(tooltipItem, data){
-                            var text = '';
-                            if(tooltipItem.index == plugDateShort){
-                                text = "Plug in your device at ";
-                                text = text + plugDate + ".";
-                            }
-                            return text;
-                        }
-                }
-            },
-            elements: {
-                center: {
-                    text1: "You should plug in at ",
-                    text2: data.data[2].plugInTime,
-                    fontStyle: 'Helvetica', // Default is Arial
-                     sidePadding: 20 // Defualt is 20 (as a percentage)
-            }
-        },
-            legend:{
-                display: false
-            },
-            layout: {
-                padding: {
-                    left: 0,
-                    right: 0,
-                    top: 15,
-                    bottom: 0
-                }
-            },
-            responsive: true,
-            maintainAspectRatio: false,
-            cutoutPercentage: 75
-        }
-    });
+    	var schChart = new Chart(ctx,{
+    		type: 'doughnut',
+    		data: {
+    			labels: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+    			datasets: [{
+    				label: '',
+    				data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    				backgroundColor: backgroundColors,
+    			},
+    				{
+    				label: '',
+    				data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    				backgroundColor: backgroundColors,
+    			}
+    			]
+    		},
+    		options: {
+    			tooltips: {
+    				callbacks: {
+    						title: function(tooltipItem, data){
+    							return data['labels'][tooltipItem[0]['index']];
+    						},
+    						label: function(tooltipItem, data){
+    							var number = numberCharging[tooltipItem.index];
+    							var text;
+    							if(number == 1)
+    								text = ' device charging at this time.';
+    							else
+    								text = ' devices charging at this time.';
+    							return number + text;
+    						},
+    						afterLabel: function(tooltipItem, data){
+    							var text = '';
+    							if(tooltipItem.index == plugDateShort){
+    								text = "Plug in your device at ";
+    								text = text + plugDate + ".";
+    							}
+    							return text;
+    						}
+    				}
+    			},
+    			elements: {
+					center: {
+						text1: "You should plug in at ",
+						text2: data.data[2].plugInTime,
+          				fontStyle: 'Helvetica', // Default is Arial
+         				 sidePadding: 20 // Defualt is 20 (as a percentage)
+				}
+			},
+    			legend:{
+    				display: false
+    			},
+    			layout: {
+           			padding: {
+                		left: 0,
+               			right: 0,
+                		top: 15,
+                		bottom: 0
+            		}
+        		},
+    			responsive: true,
+    			maintainAspectRatio: false,
+    			cutoutPercentage: 75
+    		}
+    	});
 
 }
