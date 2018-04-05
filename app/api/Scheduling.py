@@ -43,7 +43,7 @@ class BestTime24h(Resource):
 			if carbon < minCarbon:
 				minCarbon = carbon
 				minCarbonTime = data['data'][i]['from']
-		result = {'data': [{'enrgyConsumed': str(kwh)}, {'carbonProduced': str(minCarbon/kwh)}, {'plugInTime': str(minCarbonTime)}]}
+		result = {'data': [{'energyConsumed': str(kwh)}, {'carbonProduced': str(minCarbon/kwh)}, {'plugInTime': str(minCarbonTime)}]}
 		return jsonify(result)	#return a json with the data
 
 api.add_resource(BestTime24h, '/server/best24h/<powerGET>/<timeMinGET>')
