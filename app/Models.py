@@ -1,6 +1,6 @@
 # sqlalchemy declarative
 
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Integer
 from app.Database import Base
 
 # Store the registered users of the app
@@ -28,8 +28,8 @@ class UserDevices(Base):
 	
 	userId = Column(String(128), primary_key = True)
 	deviceName = Column(String(128))
-	consumption = Column(Int)
-	timeToCharge = Column(Int)
+	consumption = Column(Integer)
+	timeToCharge = Column(Integer)
 	
 	def __init__(self, userId = None, deviceName = None, consumption = None, timeToCharge = None):
 		self.userId = userId
