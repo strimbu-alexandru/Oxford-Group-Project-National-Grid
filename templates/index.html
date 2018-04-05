@@ -19,14 +19,30 @@
 
 	function formsubmit(p, m){
 
-    	$.ajax('http://team10.pythonanywhere.com/server/best24h/'+p+'/'+m, {success: function(data) {console.log(data.data[2]); document.getElementById('container').innerHTML = "You should plug your device in at " + data.data[2].plugInTime;}});
+    	$.ajax('http://team10.pythonanywhere.com/server/best24h/'+p+'/'+m, {success: function(data) {console.log(data.data[2]);
+    		document.getElementById('titletext').style.display = "none";
+    		document.getElementById('container').innerHTML = "<div class ='thumbnail text-center'> <img src = 'assets/clockscheduler.png' alt='' class='img-responsive'> <div class='caption'><h4 class = 'text-center'>You should plug your device in at <br>" + data.data[2].plugInTime + "</h4></div></div>";}});
 	}
 
 </script>
+
+<style>
+	.thumbnail {
+    position: relative;
+}
+
+.caption {
+    position: absolute;
+    top: 45%;
+    left: 0;
+    width: 100%;
+}
+
+</style>
 </head>
 <body>
 
-<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+<div id="titletext" class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
       <h1 class="display-4">Schedule a device</h1>
       <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
  </div>
