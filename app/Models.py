@@ -20,3 +20,19 @@ class User(Base):
 
 	def __repr__(self):
 		return '<User %r>' % (self.name)
+		
+# Store the device put by the users of the app
+# The devices correspond to each user, identified by its id		
+class UserDevices(Base):
+	__tablename__ = 'userDevices'
+	
+	userId = Column(String(128), primary_key = True)
+	deviceName = Column(String(128))
+	consumption = Column(Int)
+	timeToCharge = Column(Int)
+	
+	def __init__(self, userId = None, deviceName = None, consumption = None, timeToCharge = None):
+		self.userId = userId
+		self.deviceName = deviceName
+		self.consumption = consumption
+		self.timeToCharge = timeToCharge
