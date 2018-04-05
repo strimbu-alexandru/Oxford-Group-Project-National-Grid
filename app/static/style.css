@@ -1,0 +1,27 @@
+.thumbnail {
+    position: relative;
+}
+
+.caption {
+    position: absolute;
+    top: 45%;
+    left: 0;
+    width: 100%;
+}
+
+.canvas{
+	max-height: 100vh;
+}
+
+.card-img-top{
+	  max-width:60%;
+ 	 max-height:60%;
+  	width: auto;
+  	height: auto;
+  	margin-left:20%;
+}
+
+.donut-inner {
+   margin-top: -600px;
+   margin-bottom: 100px;
+}
