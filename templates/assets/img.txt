@@ -1,4 +1,0 @@
-androidico - 256x256
-appleico - 256x256
-custom - 256x256
-clockscheduler - 600x600 to be cut up for actual asset
