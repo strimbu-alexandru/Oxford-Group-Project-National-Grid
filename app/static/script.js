@@ -67,6 +67,8 @@ function writeschedule(data, m){
     var plugDateShort = plugDate.split(":")[0];
     var plugDateMins = plugDate.split(":")[1];
     var plugDateTime = data.data[2].plugInTime;
+    plugDateTime[10] = ' ';
+    plugDateTime[16] = ' ';
 
     var unplugShort = plugDateShort*1 + hours*1 + (1*plugDateMins + 1*mins)/60;
 
@@ -136,7 +138,7 @@ function writeschedule(data, m){
     			},
     			elements: {
 					center: {
-						text1: "You should plug in at mata ",
+						text1: "You should plug in at ",
 						text2: plugDateTime,
           				fontStyle: 'Helvetica', // Default is Arial
          				 sidePadding: 20 // Defualt is 20 (as a percentage)
