@@ -27,7 +27,7 @@ class UserDevices(Base):
 	__tablename__ = 'userDevices'
 	
 	userId = Column(String(128), primary_key = True)
-	deviceName = Column(String(128))
+	deviceName = Column(String(128), unique = True)
 	consumption = Column(Integer)
 	timeToCharge = Column(Integer)
 	
