@@ -23,10 +23,12 @@ app.secret_key  = Config.SECRET_KEY
 from app.Index import Index
 from app.api.Auth import Auth
 from app.api.Scheduling import Scheduling
+from app.api.UserDevices import UserDevices
 
 app.register_blueprint(Index)
 app.register_blueprint(Auth)
 app.register_blueprint(Scheduling)
+app.register_blueprint(UserDevices)
 
 # Register custom error handler with app
 from app.ErrorHandler import CustomError

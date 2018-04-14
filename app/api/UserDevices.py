@@ -7,8 +7,8 @@ from app.Database import db_session
 from app.ErrorHandler import CustomError
 from config import Config
 
-Auth = Blueprint('Auth',__name__, url_prefix='/userDevices', template_folder='templates')
-api = Api(Auth)
+UserDevices = Blueprint('UserDevices',__name__, url_prefix='/userDevices', template_folder='templates')
+api = Api(UserDevices)
 
 def getUserId(authToken):
 		user = authMethods.findUserByToken			#get the userId from User database
@@ -38,7 +38,7 @@ class DeleteUserDevice(Resource):					#deletes an entry based on userId and devi
 		authToken = request.form['authToken']		#get the parameters from the form
 		userId = getUserId(authToken)
 		deviceName = request.form['deviceName']
-		userDevice = UserDevices.query.filter(UserDevices.userId == userID && UserDevices.deviceName == deviceName).first()
+		userDevice = UserDevices.query.filter(UserDevices.userId == userID, UserDevices.deviceName == deviceName).first()
 		if userDevice != None :						#check if the user device exists
 			db_session.delete(userDevice)			#then delete it
 			db_session.commit()
