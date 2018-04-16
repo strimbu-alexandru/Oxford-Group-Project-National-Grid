@@ -1,7 +1,7 @@
 from flask import Flask, url_for, request, render_template, Blueprint, json, Response, session
 from flask_restful import Resource, Api
 
-from app.Models import UserDevices, User
+from app.Models import UserDevice, User
 from app.api.AuthMethods import authMethods
 from app.Database import db_session
 from app.ErrorHandler import CustomError
@@ -11,12 +11,12 @@ UserDevices = Blueprint('UserDevices',__name__, url_prefix='/userDevices', templ
 api = Api(UserDevices)
 
 def getUserId():
-	if isAuthenticated():
+	if authMethods.isAuthenticated():
 		#get the userId from User database
 		authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
 		user = authMethods.findUserByToken(authToken)
 		return user.userId
-	return 'Need to login'						#todo: send back to login if not authenticated
+	return 'Need to login'							#todo: send back to login if not authenticated
 
 class AddUserDevices(Resource):						#add a new user device using the token to identify the user
 	def post(self):
@@ -25,21 +25,21 @@ class AddUserDevices(Resource):						#add a new user device using the token to i
 		deviceName = request.form['deviceName']
 		consumption = request.form['consumption']
 		timeToCharge = request.form['timeToCHarge']
-		userDevices = UserDevices(userId = userId, deviceName = deviceName, consumption = consumption, timeToCHarge = timeToCharge)		#if user is valid, proceed to enter it into the user database
+		userDevices = UserDevice(userId = userId, deviceName = deviceName, consumption = consumption, timeToCHarge = timeToCharge)		#if user is valid, proceed to enter it into the user database
 		db_session.add(userDevices)
 		db_session.commit()
-		return "User added successfully!"
-		
+		return "Device added successfully!"
+
 class GetUserDevices(Resource):
 	def get(self):
 		userId = getUserId()
-		userDevices = UserDevices.query.filter(UserDevices.userId == userID)
+		userDevices = UserDevice.query.filter(UserDevice.userId == userId).all()
 		return json.dumps(userDevices)
-		
+
 class DeleteUserDevice(Resource):					#deletes an entry based on userId and deviceName
 	def get(self, deviceName):
 		userId = getUserId()
-		userDevice = UserDevices.query.filter(UserDevices.userId == userID, UserDevices.deviceName == deviceName).first()
+		userDevice = UserDevice.query.filter(UserDevice.userId == userId, UserDevice.deviceName == deviceName).first()
 		if userDevice != None :						#check if the user device exists
 			db_session.delete(userDevice)			#then delete it
 			db_session.commit()
@@ -49,7 +49,7 @@ class DeleteUserDevice(Resource):					#deletes an entry based on userId and devi
 class DeleteAllUserDevices(Resource):				#deletes all the devices for a user
 	def get(self):
 		userId = getUserId()
-		userDevices = UserDevices.query.filter(UserDevices.userId == userID)    #get all the devices
+		userDevices = UserDevice.query.filter(UserDevice.userId == userId).all()    #get all the devices
 		for item in userDevices :
 			db_session.delete(item)
 		db_session.commit()

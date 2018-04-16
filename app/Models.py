@@ -23,7 +23,7 @@ class User(Base):
 		
 # Store the device put by the users of the app
 # The devices correspond to each user, identified by its id
-class UserDevices(Base):
+class UserDevice(Base):
 	__tablename__ = 'userDevices'
 	
 	deviceId = Column(Integer, primary_key = True)
