@@ -4,15 +4,58 @@ var options =[{"text"  : "iPhone","value" : "iPhone", "power": "30", "minutes": 
     ];
 
 
-function formsubmit(p, m){
+function formsubmit(id, p=0, m=0, toDB = false){
 
-    $.ajax('./server/best24h/'+p+'/'+m, {
-        success: function(data) {
-            writeschedule(data, m)
-        }
-    });
-}
+    switch(id){
+        case "template":
+            var vals = $('#templateDevices').val() || [];
+            var listDevs = [];
 
+            var p = options[vals[0]].power;
+            var m = options[vals[0]].minutes;
+                $.ajax('./server/best24h/'+p+'/'+m, {
+                success: function(data) {
+                //listDevs.push({'data': data, 'm':m});
+                writeschedule(data, m); 
+            }
+            }
+            );
+            break;
+
+        case "owndevice":
+            var vals = $('ownDevices').val();
+            var listDevs = [];
+            for(var i =0; i<vals.length; i++)
+            {
+                var p = vals[i].value.power;
+                var m = vals[i].value.minutes;
+                $.ajax('./server/best24h/'+p+'/'+m, {
+                success: function(data) {
+                listDevs.push({'data': data, 'm':m});
+                
+            }
+            }
+            );
+            }
+            writeschedule(listDevs) 
+            break;
+
+        case "newdevice":
+            var form = document.getElementById('custdata');
+            if(toDB){
+                form.submit();
+            }
+
+
+            $.ajax('./server/best24h/'+p+'/'+m, {
+            success: function(data) {
+                var listDevs = [{'data': data, 'm':m}]
+                writeschedule(listDevs)
+            }
+            });
+            break;
+    }
+    
     Chart.pluginService.register({
     beforeDraw: function (chart) {
         if (chart.config.options.elements.center) {
@@ -56,7 +99,7 @@ function formsubmit(p, m){
         }
     }
 });
-
+}
 
 function writeschedule(data, m){
     //Calculate length of single charge
@@ -77,88 +120,234 @@ function writeschedule(data, m){
 
     //fakes numberCharging, I hope to get this from db
     for(var i = 0; i<24; i++){
-    		if(i >= plugDateShort && i <= unplugShort)
-    			numberCharging.push(1);
-    		else
-    			numberCharging.push(0);
-    	}
+            if(i >= plugDateShort && i <= unplugShort)
+                numberCharging.push(1);
+            else
+                numberCharging.push(0);
+        }
 
-    	for(var i = 0; i<24; i++){
-    		if(numberCharging[i]<1)
-    			backgroundColors.push('gray');
-    		else
-    			backgroundColors.push('green');
-    	}
+        for(var i = 0; i<24; i++){
+            if(numberCharging[i]<1)
+                backgroundColors.push('gray');
+            else
+                backgroundColors.push('green');
+        }
 
 
 
     $('#resultsModal').modal('show');
 
     var ctx = document.getElementById('schedulerchart');
-    	var schChart = new Chart(ctx,{
-    		type: 'doughnut',
-    		data: {
-    			labels: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
-    			datasets: [{
-    				label: '',
-    				data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    				backgroundColor: backgroundColors,
-    			},
-    				{
-    				label: '',
-    				data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    				backgroundColor: backgroundColors,
-    			}
-    			]
-    		},
-    		options: {
-    			tooltips: {
-    				callbacks: {
-    						title: function(tooltipItem, data){
-    							return data['labels'][tooltipItem[0]['index']];
-    						},
-    						label: function(tooltipItem, data){
-    							var number = numberCharging[tooltipItem.index];
-    							var text;
-    							if(number == 1)
-    								text = ' device charging at this time.';
-    							else
-    								text = ' devices charging at this time.';
-    							return number + text;
-    						},
-    						afterLabel: function(tooltipItem, data){
-    							var text = '';
-    							if(tooltipItem.index == plugDateShort){
-    								text = "Plug in your device at ";
-    								text = text + plugDate + ".";
-    							}
-    							return text;
-    						}
-    				}
-    			},
-    			elements: {
-					center: {
-						text1: "You should plug in at ",
-						text2: plugDateTime,
-          				fontStyle: 'Helvetica', // Default is Arial
-         				 sidePadding: 20 // Defualt is 20 (as a percentage)
-				}
-			},
-    			legend:{
-    				display: false
-    			},
-    			layout: {
-           			padding: {
-                		left: 0,
-               			right: 0,
-                		top: 15,
-                		bottom: 0
-            		}
-        		},
-    			responsive: true,
-    			maintainAspectRatio: false,
-    			cutoutPercentage: 75
-    		}
-    	});
+        var schChart = new Chart(ctx,{
+            type: 'doughnut',
+            data: {
+                labels: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                datasets: [{
+                    label: '',
+                    data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    backgroundColor: backgroundColors,
+                },
+                    {
+                    label: '',
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    backgroundColor: backgroundColors,
+                }
+                ]
+            },
+            options: {
+                tooltips: {
+                    callbacks: {
+                            title: function(tooltipItem, data){
+                                return data['labels'][tooltipItem[0]['index']];
+                            },
+                            label: function(tooltipItem, data){
+                                var number = numberCharging[tooltipItem.index];
+                                var text;
+                                if(number == 1)
+                                    text = ' device charging at this time.';
+                                else
+                                    text = ' devices charging at this time.';
+                                return number + text;
+                            },
+                            afterLabel: function(tooltipItem, data){
+                                var text = '';
+                                if(tooltipItem.index == plugDateShort){
+                                    text = "Plug in your device at ";
+                                    text = text + plugDate + ".";
+                                }
+                                return text;
+                            }
+                    }
+                },
+                elements: {
+                    center: {
+                        text1: "You should plug in at ",
+                        text2: plugDateTime,
+                        fontStyle: 'Helvetica', // Default is Arial
+                         sidePadding: 20 // Defualt is 20 (as a percentage)
+                }
+            },
+                legend:{
+                    display: false
+                },
+                layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 15,
+                        bottom: 0
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                cutoutPercentage: 75
+            }
+        });
 
 }
+
+
+function onSignIn(googleUser) {
+                var loginHandler = 'http://team10.pythonanywhere.com/auth/login';
+
+                var profile = googleUser.getBasicProfile();
+                var signInButton = document.getElementById("signIn");
+                var signOutText = document.getElementById("signOut");
+                var manageLink = document.getElementById("manage");
+
+                signInButton.style.display="none";
+                signOutText.style.display="block";
+                manageLink.style.display="block";
+                
+                console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+                console.log('Name: ' + profile.getName());
+                console.log('Image URL: ' + profile.getImageUrl());
+                console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+                var id_token = googleUser.getAuthResponse().id_token;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', loginHandler, true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+        console.log(xhr.responseText);
+        jwToken = xhr.responseText;
+    };
+    xhr.send('idtoken=' + id_token);
+}
+
+    function signOut() {
+
+    var logoutHandler = 'http://team10.pythonanywhere.com/auth/logout'
+
+    var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                });
+    var signInButton = document.getElementById("signIn");
+var signOutText = document.getElementById("signOut");
+var manageLink = document.getElementById("manage");
+    signInButton.style.display="block";
+    signOutText.style.display="none";
+    manageLink.style.display="none";
+                // tell server to sign user out
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', logoutHandler);
+                xhr.onload = function() {
+                  console.log(xhr.responseText);
+                  jwToken='';
+                };
+                xhr.send();
+}
+
+
+function showElList(){
+    var el = document.getElementById('deviceList');
+    var deviceGet = 'http://team10.pythonanywhere.com/userDevices/get';
+
+    //For testing
+    var deviceList = [{name: "1"}, {name:"2"}];
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', deviceGet, true);
+    xhr.onload = function() {
+       deviceList = xhr.response;
+    };
+    xhr.send();
+
+    if(deviceList.length > 0){
+        //Reset the form
+        while (el.firstChild) {
+        el.removeChild(el.firstChild);
+}
+
+    for(var i = 0; i<deviceList.length; i++){
+        var node = document.createElement('li');
+        node.className = "list-group-item";
+        node.innerHTML = deviceList[i].name +'<i class="js-remove">✖</i>';
+        node.value = i;
+        el.appendChild(node);
+
+    }}
+    else
+    {
+        var textContent = document.createTextNode("No devices currently registered!");
+        el.appendChild(textContent);
+    }
+
+
+    // Editable list
+    var editableList = Sortable.create(el, {
+    filter: '.js-remove',
+    onFilter: function (evt) {
+        var el = editableList.closest(evt.item); // get dragged item
+        console.log(el);
+        var deviceDelete = 'http://team10.pythonanywhere.com/userDevices/delete';
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', deviceDelete + '?'+ deviceList[el.value].name, true);
+            xhr.onload = function() {
+            };
+
+            xhr.send();
+            el && el.parentNode.removeChild(el);
+    }
+    });
+
+    $('#manageModal').modal('show');
+
+}
+
+
+function loadOwnDevices(){
+    var deviceGet = 'http://team10.pythonanywhere.com/userDevices/get';
+    var deviceList = [];
+    var el = document.getElementById('ownDevices');
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', deviceGet, true);
+    xhr.onload = function() {
+       deviceList = xhr.response;
+    };
+    xhr.send();
+
+    //for testing
+    deviceList = [{name: "1"}, {name:"2"}];
+
+    //Clear form
+    while (el.firstChild) {
+    el.removeChild(el.firstChild);}
+
+    //Populate the form with values
+    for(var i = 0; i<deviceList.length; i++)
+    {
+        var node = document.createElement('option');
+        node.value = i;
+        node.innerHTML = deviceList[i].name;
+        el.appendChild(node);
+    }
+}
+
+
+
+

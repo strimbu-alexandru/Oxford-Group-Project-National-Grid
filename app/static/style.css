@@ -25,3 +25,26 @@
    margin-top: -600px;
    margin-bottom: 100px;
 }
+
+#deviceList {}
+  #deviceList li {
+    position: relative;
+  }
+
+  #deviceList i {
+    -webkit-transition: opacity .2s;
+    transition: opacity .2s;
+    opacity: 0;
+    display: block;
+    cursor: pointer;
+    color: #c00;
+    top: 10px;
+    right: 40px;
+    position: absolute;
+    font-style: normal;
+  }
+
+  #deviceList li:hover i {
+    opacity: 1;
+  }
+
