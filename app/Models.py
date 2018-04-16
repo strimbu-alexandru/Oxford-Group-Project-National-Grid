@@ -1,6 +1,6 @@
 # sqlalchemy declarative
 
-from sqlalchemy import Column, String, DateTime, Integer
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, UniqueConstraint
 from app.Database import Base
 
 # Store the registered users of the app
@@ -26,10 +26,12 @@ class User(Base):
 class UserDevices(Base):
 	__tablename__ = 'userDevices'
 	
-	userId = Column(String(128), primary_key = True)
-	deviceName = Column(String(128), unique = True)
+	userId = Column(String(128), ForeignKey('users.userId'), primary_key = 'true')
+	deviceName = Column(String(128))
 	consumption = Column(Integer)
 	timeToCharge = Column(Integer)
+	
+	__table_args__ = (UniqueConstraint('userId', 'deviceName', name = 'uniqueConstraint'),)
 	
 	def __init__(self, userId = None, deviceName = None, consumption = None, timeToCharge = None):
 		self.userId = userId
