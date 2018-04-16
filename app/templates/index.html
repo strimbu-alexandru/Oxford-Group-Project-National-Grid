@@ -5,22 +5,46 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-	<title>National Grid App Thingy</title>
+    <meta name="google-signin-client_id" content="395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleusercontent.com">
+	<title>National Grid Eco-scheduler</title>
 
 	<!-- bootstrap -->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 	<script src ="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
-	
-    <script type="text/javascript" src="{{url_for('.static', filename='script.js')}}"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+     <script type="text/javascript" src="{{url_for('.static', filename='script.js')}}"></script>
+
     <link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='style.css')}}">
+
 
 </head>
 
 <body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="/index.html">Eco-Scheduler</a>
+  <div class="collapse navbar-collapse">
+
+    <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item active" id="signIn">
+            <div class="g-signin2"  data-onsuccess="onSignIn" style="display: inline-block;"></div>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="#" id="manage" onclick="showElList()"> Manage devices</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="#" onclick="signOut()" id="signOut">Sign out</a>
+        </li>
+    </ul>
+</div>
+</nav>
+
 
     <div class = "container" id = "container">
 
@@ -33,47 +57,76 @@
             <!-- Card 1 -->
             <div class = "card">
                 <div class = "card-body">
-                    <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='appleico.png')}}">
-                    <h5 class = "card-title text-center"> Template 1</h5>
-                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit(options[0].power, options[0].minutes)"> Schedule</button>
+                    <!--<img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='appleico.png')}}">-->
+                    <h5 class = "card-title text-center"> Templates</h5>
+                      <div class="form-group">
+                            <label for="templateDevices">Select the devices you want to schedule:</label>
+                            <select class="form-control" id="templateDevices">
+                            <option value='0'>iPhone</option>
+                            <option value='1'}>Android</option>
+                            </select>
+                       </div>
+                  
                 </div>
+                <div class="card-footer">
+                    
+                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit('template')"> Schedule</button>
+                  </div>
             </div>
             <!-- Card 2 -->
             <div class = "card">
                 <div class = "card-body">
-                    <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='androidico.png')}}">
-                    <h5 class = "card-title text-center"> Template 2</h5>
-                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit(options[1].power, options[1].minutes)"> Schedule</button>
+                   <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='androidico.png')}}"> -->
+                    <h5 class = "card-title text-center"> Your devices:</h5>
+                    <div class="form-group">
+                            <label for="ownDevices">Select the devices you want to schedule:</label>
+                            <button type = "button" class = "btn" onclick="loadOwnDevices()">
+                        Load own devices</button><BR>
+                            <select  class="form-control" id="ownDevices">
+                            </select>
+                       </div>
+                </div>
+                <div class="card-footer">
+                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit('owndevice')"> Schedule</button>
                 </div>
             </div>
             <!-- Card 3 -->
             <div class = "card">
                 <div class = "card-body ">
-                    <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='custom.png')}}">
+                   <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='custom.png')}}"> -->
                     <h5 class = "card-title text-center"> Custom</h5>
-                    <form id = "custdata">
+                    <form id = "custdata" action="userDevices/add" method="POST">
                         <div class = "form-group">
+                            <label for="inputName"> Device Name </label>
+                            <input type="text" class = "form-control" name='name' id='inputName' placeholder="Enter device name">
                             <label for="inputPower"> Power </label>
-                            <input type="text" class = "form-control" id="inputPower" placeholder="Enter power (kWh)">
+                            <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kWh)">
                             <label for="inputMinutes"> Minutes required to charge </label>
-                            <input type="text" class = "form-control" id="inputMinutes" placeholder="Enter minutes">
+                            <input type="text" class = "form-control" id="inputMinutes" 'timeToCharge' placeholder="Enter minutes">
+                            <div class = "form-check">
+                            <input type="checkbox" class="form-check-input" id="submitCheck">
+                            <label class="form-check-label" for="submitCheck">Register device</label>
                         </div>
                     </form>
-                    <button type = "button" 
-                        class = "btn btn-lg btn-block btn-outline-primary"
-                        onclick = "formsubmit (document.getElementById('inputPower').value, document.getElementById('inputMinutes').value)"> Schedule</button>
-                </div>
+                    </div>
+                    
             </div>
+            <div class='card-footer'>
+                        <button type = "button" 
+                        class = "btn btn-lg btn-block btn-outline-primary"
+                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value, document.getElementById('submitCheck').checked)"> Schedule</button>
+                        </div>
+                </div>
         </div>
 
     </div>
 	
 <!-- Modal for results -->
-<div class="modal" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+<div class="modal bd-example-modal-lg" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-      	<h3 class="modal-title" id="myModalLabel">Results</h3>
+      	<h3 class="modal-title">Results</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="resultsModalBody">
@@ -82,5 +135,25 @@
     </div>
   </div>
 </div>
+
+<!-- Modal for managing devices -->
+<div class="modal bd-example-modal-lg" id="manageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Manage devices</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body" id="manageModalBody">
+        <h5> Delete devices here.</h5>
+        <ul class="list-group" id="deviceList">
+            <!-- Elements will be populated here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
