@@ -22,11 +22,12 @@ class User(Base):
 		return '<User %r>' % (self.name)
 		
 # Store the device put by the users of the app
-# The devices correspond to each user, identified by its id		
+# The devices correspond to each user, identified by its id
 class UserDevices(Base):
 	__tablename__ = 'userDevices'
 	
-	userId = Column(String(128), ForeignKey('users.userId'), primary_key = 'true')
+	deviceId = Column(Integer, primary_key = True)
+	userId = Column(String(128), ForeignKey('users.userId'))
 	deviceName = Column(String(128))
 	consumption = Column(Integer)
 	timeToCharge = Column(Integer)
