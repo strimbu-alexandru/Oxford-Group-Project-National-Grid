@@ -1,6 +1,7 @@
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from flask import Flask, url_for, request, render_template, Blueprint, json, Response, session
+from functools import wraps
+from flask import Flask, url_for, request, render_template, Blueprint, json, Response, session, redirect
 from flask_restful import Resource, Api
 
 from app.api.AuthMethods import authMethods
@@ -14,17 +15,28 @@ CLIENT_ID = '395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleuserconten
 
 # For rendering the webpages
 def output_html(data, code, headers=None):
-    resp = Response(data, mimetype='text/html', headers=headers)
-    resp.status_code = code
-    return resp
+	resp = Response(data, mimetype='text/html', headers=headers)
+	resp.status_code = code
+	return resp
+
+
+# Checks user is logged in. Redirects to login page if not
+def login_required(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		if isAuthenticated():
+			return f(*args, **kwargs)
+		return redirect(url_for('Auth.login'))
+
+	return decorated_function
+
 
 class Home(Resource):
+	@login_required
 	def get(self):
-		if isAuthenticated():
-			authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
-			user = authMethods.findUserByToken(authToken)
-			return 'Logged in as ' + user.name
-		return Login.get(self)
+		authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
+		user = authMethods.findUserByToken(authToken)
+		return 'Logged in as ' + user.name
 
 # Log the user in. Generates a new token each time.
 class Login(Resource):

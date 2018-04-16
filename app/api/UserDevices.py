@@ -6,37 +6,39 @@ from app.api.AuthMethods import authMethods
 from app.Database import db_session
 from app.ErrorHandler import CustomError
 from config import Config
+from app.api.Auth import login_required
 
 UserDevices = Blueprint('UserDevices',__name__, url_prefix='/userDevices', template_folder='templates')
 api = Api(UserDevices)
 
 def getUserId():
-	if authMethods.isAuthenticated():
-		#get the userId from User database
-		authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
-		user = authMethods.findUserByToken(authToken)
-		return user.userId
-	return 'Need to login'							#todo: send back to login if not authenticated
+	#get the userId from User database
+	authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
+	user = authMethods.findUserByToken(authToken)
+	return user.userId
 
 class AddUserDevices(Resource):						#add a new user device using the token to identify the user
+	@login_required
 	def post(self):
 		userId = getUserId()
 		#get the parameters from the form
 		deviceName = request.form['deviceName']
 		consumption = request.form['consumption']
 		timeToCharge = request.form['timeToCHarge']
-		userDevices = UserDevice(userId = userId, deviceName = deviceName, consumption = consumption, timeToCHarge = timeToCharge)		#if user is valid, proceed to enter it into the user database
+		userDevices = UserDevice(userId = userId, deviceName = deviceName, consumption = consumption, timeToCharge = timeToCharge)		#if user is valid, proceed to enter it into the user database
 		db_session.add(userDevices)
 		db_session.commit()
 		return "Device added successfully!"
 
 class GetUserDevices(Resource):
+	@login_required
 	def get(self):
 		userId = getUserId()
 		userDevices = UserDevice.query.filter(UserDevice.userId == userId).all()
-		return json.dumps(userDevices)
+		return userDevices._asdict()
 
 class DeleteUserDevice(Resource):					#deletes an entry based on userId and deviceName
+	@login_required
 	def get(self, deviceName):
 		userId = getUserId()
 		userDevice = UserDevice.query.filter(UserDevice.userId == userId, UserDevice.deviceName == deviceName).first()
@@ -47,6 +49,7 @@ class DeleteUserDevice(Resource):					#deletes an entry based on userId and devi
 		return "Device not found in the database!"
 		
 class DeleteAllUserDevices(Resource):				#deletes all the devices for a user
+	@login_required
 	def get(self):
 		userId = getUserId()
 		userDevices = UserDevice.query.filter(UserDevice.userId == userId).all()    #get all the devices
