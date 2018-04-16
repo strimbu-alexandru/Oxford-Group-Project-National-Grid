@@ -10,14 +10,18 @@ from config import Config
 UserDevices = Blueprint('UserDevices',__name__, url_prefix='/userDevices', template_folder='templates')
 api = Api(UserDevices)
 
-def getUserId(authToken):
-		user = authMethods.findUserByToken(authToken)			#get the userId from User database
+def getUserId():
+	if isAuthenticated():
+		#get the userId from User database
+		authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
+		user = authMethods.findUserByToken(authToken)
 		return user.userId
+	return 'Need to login'						#todo: send back to login if not authenticated
 
 class AddUserDevices(Resource):						#add a new user device using the token to identify the user
 	def post(self):
-		authToken = request.form['authToken']		#get the parameters from the form
-		userId = getUserId(authToken)
+		userId = getUserId()
+		#get the parameters from the form
 		deviceName = request.form['deviceName']
 		consumption = request.form['consumption']
 		timeToCharge = request.form['timeToCHarge']
@@ -28,16 +32,13 @@ class AddUserDevices(Resource):						#add a new user device using the token to i
 		
 class GetUserDevices(Resource):
 	def get(self):
-		authToken = request.form['authToken']		#get the parameters from the form
-		userId = getUserId(authToken)
+		userId = getUserId()
 		userDevices = UserDevices.query.filter(UserDevices.userId == userID)
 		return json.dumps(userDevices)
 		
 class DeleteUserDevice(Resource):					#deletes an entry based on userId and deviceName
-	def get(self):
-		authToken = request.form['authToken']		#get the parameters from the form
-		userId = getUserId(authToken)
-		deviceName = request.form['deviceName']
+	def get(self, deviceName):
+		userId = getUserId()
 		userDevice = UserDevices.query.filter(UserDevices.userId == userID, UserDevices.deviceName == deviceName).first()
 		if userDevice != None :						#check if the user device exists
 			db_session.delete(userDevice)			#then delete it
@@ -47,8 +48,7 @@ class DeleteUserDevice(Resource):					#deletes an entry based on userId and devi
 		
 class DeleteAllUserDevices(Resource):				#deletes all the devices for a user
 	def get(self):
-		authToken = request.form['authToken']		#get the parameters from the form
-		userId = getUserId(authToken)
+		userId = getUserId()
 		userDevices = UserDevices.query.filter(UserDevices.userId == userID)    #get all the devices
 		for item in userDevices :
 			db_session.delete(item)
@@ -58,6 +58,5 @@ class DeleteAllUserDevices(Resource):				#deletes all the devices for a user
 
 api.add_resource(AddUserDevices, '/add')
 api.add_resource(GetUserDevices, '/get')
-api.add_resource(DeleteUserDevice, '/delete')
+api.add_resource(DeleteUserDevice, '/delete/<deviceName>')
 api.add_resource(DeleteAllUserDevices, '/deleteAll')
-
