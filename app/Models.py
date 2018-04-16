@@ -1,10 +1,21 @@
 # sqlalchemy declarative
 
+from collections import OrderedDict
 from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, UniqueConstraint
+
 from app.Database import Base
 
+# Basic serialiser for models
+class DictSerializable(object):
+    def _asdict(self):
+        result = OrderedDict()
+        for key in self.__mapper__.c.keys():
+            result[key] = getattr(self, key)
+        return result
+
+
 # Store the registered users of the app
-class User(Base):
+class User(Base, DictSerializable):
 	__tablename__ = 'users'
 
 	userId 			= Column(String(128), primary_key = True)
@@ -23,7 +34,7 @@ class User(Base):
 		
 # Store the device put by the users of the app
 # The devices correspond to each user, identified by its id
-class UserDevice(Base):
+class UserDevice(Base, DictSerializable):
 	__tablename__ = 'userDevices'
 	
 	deviceId = Column(Integer, primary_key = True)

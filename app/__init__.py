@@ -1,6 +1,5 @@
 from flask import Flask, Blueprint, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from app.Database import init_db, db_session
 
 app = Flask(__name__)
 
@@ -9,6 +8,8 @@ from config import Config
 app.config.from_object(Config)
 
 # Set up database
+from app.Database import init_db, db_session
+
 db = SQLAlchemy(app)
 init_db()
 
