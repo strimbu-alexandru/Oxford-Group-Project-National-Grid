@@ -11,7 +11,7 @@ UserDevices = Blueprint('UserDevices',__name__, url_prefix='/userDevices', templ
 api = Api(UserDevices)
 
 def getUserId(authToken):
-		user = authMethods.findUserByToken			#get the userId from User database
+		user = authMethods.findUserByToken(authToken)			#get the userId from User database
 		return user.userId
 
 class AddUserDevices(Resource):						#add a new user device using the token to identify the user
