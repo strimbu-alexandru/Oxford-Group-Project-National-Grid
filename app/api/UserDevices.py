@@ -22,9 +22,9 @@ class AddUserDevices(Resource):						#add a new user device using the token to i
 	def post(self):
 		userId = getUserId()
 		#get the parameters from the form
-		deviceName = request.form['deviceName']
+		deviceName = request.form['name']
 		consumption = request.form['consumption']
-		timeToCharge = request.form['timeToCHarge']
+		timeToCharge = request.form['timeToCharge']
 		userDevices = UserDevice(userId = userId, deviceName = deviceName, consumption = consumption, timeToCharge = timeToCharge)		#if user is valid, proceed to enter it into the user database
 		db_session.add(userDevices)
 		db_session.commit()
