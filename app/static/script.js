@@ -266,36 +266,34 @@ function showElList(){
     var el = document.getElementById('deviceList');
     var deviceGet = 'http://team10.pythonanywhere.com/userDevices/get';
 
-    //For testing
-    var deviceList = [{name: "1"}, {name:"2"}];
+    var deviceList = [];
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
-       deviceList = xhr.response;
+        deviceList = JSON.parse(xhr.response);
+
+        if(deviceList.length > 0){
+            //Reset the form
+            while (el.firstChild) {
+                el.removeChild(el.firstChild);
+            }
+
+            for(var i = 0; i<deviceList.length; i++){
+                var node = document.createElement('li');
+                node.className = "list-group-item";
+                node.innerHTML = deviceList[i].deviceName +'<i class="js-remove">✖</i>';
+                node.value = i;
+                el.appendChild(node);
+            }
+        }
+        else
+        {
+            var textContent = document.createTextNode("No devices currently registered!");
+            el.appendChild(textContent);
+        }
     };
     xhr.send();
-
-    if(deviceList.length > 0){
-        //Reset the form
-        while (el.firstChild) {
-        el.removeChild(el.firstChild);
-    }
-
-    for(var i = 0; i<deviceList.length; i++){
-        var node = document.createElement('li');
-        node.className = "list-group-item";
-        node.innerHTML = deviceList[i].name +'<i class="js-remove">✖</i>';
-        node.value = i;
-        el.appendChild(node);
-
-    }}
-    else
-    {
-        var textContent = document.createTextNode("No devices currently registered!");
-        el.appendChild(textContent);
-    }
-
 
     // Editable list
     var editableList = Sortable.create(el, {
@@ -305,13 +303,13 @@ function showElList(){
         console.log(el);
         var deviceDelete = 'http://team10.pythonanywhere.com/userDevices/delete';
 
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', deviceDelete + '?'+ deviceList[el.value].name, true);
-            xhr.onload = function() {
-            };
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', deviceDelete + '/'+ deviceList[el.value].deviceName, true);
+        xhr.onload = function() {
+        };
 
-            xhr.send();
-            el && el.parentNode.removeChild(el);
+        xhr.send();
+        el && el.parentNode.removeChild(el);
     }
     });
 
@@ -329,14 +327,13 @@ function loadOwnDevices(){
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
         deviceList = JSON.parse(xhr.response);
-        
+
         //Populate the form with values
         for(var i = 0; i<deviceList.length; i++)
         {
             var node = document.createElement('option');
             node.value = i;
             node.innerHTML = deviceList[i].deviceName;
-            console.log('Device Name: ' + i + ': ' + deviceList[i].deviceName);
 
             el.appendChild(node);
         }
