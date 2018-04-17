@@ -35,7 +35,13 @@ class GetUserDevices(Resource):
 	def get(self):
 		userId = getUserId()
 		userDevices = UserDevice.query.filter(UserDevice.userId == userId).all()
-		return userDevices._asdict()
+
+		# Serialise the user devices returned.
+		def dictify(UserDevice):
+			return UserDevice._asdict()
+		UserDevicesDict = list(map(dictify, userDevices))
+
+		return UserDevicesDict
 
 class DeleteUserDevice(Resource):					#deletes an entry based on userId and deviceName
 	@login_required
