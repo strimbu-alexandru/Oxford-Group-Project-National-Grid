@@ -210,21 +210,21 @@ function writeschedule(data, m){
 function onSignIn(googleUser) {
                 var loginHandler = 'http://team10.pythonanywhere.com/auth/login';
 
-                var profile = googleUser.getBasicProfile();
-                var signInButton = document.getElementById("signIn");
-                var signOutText = document.getElementById("signOut");
-                var manageLink = document.getElementById("manage");
+    var profile = googleUser.getBasicProfile();
+    var signInButton = document.getElementById("signIn");
+    var signOutText = document.getElementById("signOut");
+    var manageLink = document.getElementById("manage");
 
-                signInButton.style.display="none";
-                signOutText.style.display="block";
-                manageLink.style.display="block";
-                
-                console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-                console.log('Name: ' + profile.getName());
-                console.log('Image URL: ' + profile.getImageUrl());
-                console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    signInButton.style.display="none";
+    signOutText.style.display="block";
+    manageLink.style.display="block";
+    
+    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 
-                var id_token = googleUser.getAuthResponse().id_token;
+    var id_token = googleUser.getAuthResponse().id_token;
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', loginHandler, true);
@@ -236,7 +236,7 @@ function onSignIn(googleUser) {
     xhr.send('idtoken=' + id_token);
 }
 
-    function signOut() {
+function signOut() {
 
     var logoutHandler = 'http://team10.pythonanywhere.com/auth/logout'
 
@@ -245,19 +245,20 @@ function onSignIn(googleUser) {
                     console.log('User signed out.');
                 });
     var signInButton = document.getElementById("signIn");
-var signOutText = document.getElementById("signOut");
-var manageLink = document.getElementById("manage");
+    var signOutText = document.getElementById("signOut");
+    var manageLink = document.getElementById("manage");
     signInButton.style.display="block";
     signOutText.style.display="none";
     manageLink.style.display="none";
-                // tell server to sign user out
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', logoutHandler);
-                xhr.onload = function() {
-                  console.log(xhr.responseText);
-                  jwToken='';
-                };
-                xhr.send();
+
+    // tell server to sign user out
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', logoutHandler);
+    xhr.onload = function() {
+      console.log(xhr.responseText);
+      jwToken='';
+    };
+    xhr.send();
 }
 
 
@@ -279,7 +280,7 @@ function showElList(){
         //Reset the form
         while (el.firstChild) {
         el.removeChild(el.firstChild);
-}
+    }
 
     for(var i = 0; i<deviceList.length; i++){
         var node = document.createElement('li');
@@ -327,27 +328,23 @@ function loadOwnDevices(){
     var xhr = new XMLHttpRequest();
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
-       deviceList = xhr.response;
+        deviceList = JSON.parse(xhr.response);
+        
+        //Populate the form with values
+        for(var i = 0; i<deviceList.length; i++)
+        {
+            var node = document.createElement('option');
+            node.value = i;
+            node.innerHTML = deviceList[i].deviceName;
+            console.log('Device Name: ' + i + ': ' + deviceList[i].deviceName);
+
+            el.appendChild(node);
+        }
     };
     xhr.send();
-
-    //for testing
-    deviceList = [{name: "1"}, {name:"2"}];
 
     //Clear form
     while (el.firstChild) {
     el.removeChild(el.firstChild);}
 
-    //Populate the form with values
-    for(var i = 0; i<deviceList.length; i++)
-    {
-        var node = document.createElement('option');
-        node.value = i;
-        node.innerHTML = deviceList[i].name;
-        el.appendChild(node);
-    }
 }
-
-
-
-
