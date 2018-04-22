@@ -16,28 +16,28 @@ function formsubmit(id, p=0, m=0, toDB = false){
                 $.ajax('./server/best24h/'+p+'/'+m, {
                 success: function(data) {
                 //listDevs.push({'data': data, 'm':m});
-                writeschedule(data, m); 
+                writeschedule(data, m);
             }
             }
             );
             break;
 
         case "owndevice":
-            var vals = $('ownDevices').val();
-            var listDevs = [];
+            var vals = $.parseJSON($('#ownDevices option:selected').val());
+            /*var listDevs = [];
             for(var i =0; i<vals.length; i++)
-            {
-                var p = vals[i].value.power;
-                var m = vals[i].value.minutes;
+            {*/
+                var p = vals.power;
+                var m = vals.minutes;
                 $.ajax('./server/best24h/'+p+'/'+m, {
                 success: function(data) {
-                listDevs.push({'data': data, 'm':m});
-                
+                //listDevs.push({'data': data, 'm':m});
+                writeschedule(data, m);
             }
             }
             );
-            }
-            writeschedule(listDevs);
+            //}
+            //writeschedule(listDevs);
             break;
 
         case "newdevice":
@@ -55,13 +55,13 @@ function formsubmit(id, p=0, m=0, toDB = false){
             });
             break;
     }
-    
+
     Chart.pluginService.register({
     beforeDraw: function (chart) {
         if (chart.config.options.elements.center) {
     //Get ctx from string
     var ctx = chart.chart.ctx;
-    
+
             //Get options from the center object in options
     var centerConfig = chart.config.options.elements.center;
     var fontStyle = centerConfig.fontStyle || 'Arial';
@@ -72,7 +72,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
     var sidePaddingCalculated = (sidePadding/100) * (chart.innerRadius * 2)
     //Start with a base font of 30px
     ctx.font = "30px " + fontStyle;
-    
+
             //Get the width of the string and also the width of the element minus 10 to give it 5px side padding
     var stringWidth = ctx.measureText(txt1).width;
     var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
@@ -92,7 +92,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
     var centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
     ctx.font = fontSizeToUse+"px " + fontStyle;
     ctx.fillStyle = color;
-    
+
     //Draw text in center
     ctx.fillText(txt1, centerX, centerY-0.8*fontSizeToUse);
     ctx.fillText(txt2, centerX, centerY+0.8*fontSizeToUse);
@@ -223,7 +223,7 @@ function onSignIn(googleUser) {
     signInButton.style.display="none";
     signOutText.style.display="block";
     manageLink.style.display="block";
-    
+
     console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
     console.log('Name: ' + profile.getName());
     console.log('Image URL: ' + profile.getImageUrl());
@@ -337,7 +337,7 @@ function loadOwnDevices(){
         for(var i = 0; i<deviceList.length; i++)
         {
             var node = document.createElement('option');
-            node.value = i;
+            node.value = '{"id":' + i + ', "power":' + deviceList[i].consumption + ', "minutes":' + deviceList[i].timeToCharge + '}';
             node.innerHTML = deviceList[i].deviceName;
 
             el.appendChild(node);
