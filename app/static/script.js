@@ -37,7 +37,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
             }
             );
             }
-            writeschedule(listDevs) 
+            writeschedule(listDevs);
             break;
 
         case "newdevice":
@@ -49,8 +49,8 @@ function formsubmit(id, p=0, m=0, toDB = false){
 
             $.ajax('./server/best24h/'+p+'/'+m, {
             success: function(data) {
-                var listDevs = [{'data': data, 'm':m}]
-                writeschedule(listDevs)
+                //var listDevs = [{'data': data, 'm':m}];
+                writeschedule(data,m);
             }
             });
             break;
@@ -101,6 +101,11 @@ function formsubmit(id, p=0, m=0, toDB = false){
 });
 }
 
+function setCharAt(str,index,chr) {
+    if(index > str.length-1) return str;
+    return str.substr(0,index) + chr + str.substr(index+1);
+}
+
 function writeschedule(data, m){
     //Calculate length of single charge
     var hours = m/60;var mins = m%60;
@@ -110,8 +115,8 @@ function writeschedule(data, m){
     var plugDateShort = plugDate.split(":")[0];
     var plugDateMins = plugDate.split(":")[1];
     var plugDateTime = data.data[2].plugInTime;
-    plugDateTime[10] = ' ';
-    plugDateTime[16] = ' ';
+    plugDateTime = setCharAt(plugDateTime,10,' ');
+    plugDateTime = setCharAt(plugDateTime,16,' ');
 
     var unplugShort = plugDateShort*1 + hours*1 + (1*plugDateMins + 1*mins)/60;
 
