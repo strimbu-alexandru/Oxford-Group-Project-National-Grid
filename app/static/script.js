@@ -115,7 +115,9 @@ function writeschedule(data, m){
     var hours = m/60;var mins = m%60;
     var plugDate =data.data[0].plugInTime;
     var carbProd = data.data[0].carbonProduced;
+    carbProd = Math.round(carbProd * 100) / 100;
     var energy = data.data[0].energyConsumed;
+    energy = Math.round(energy * 100) / 100;
     plugDate = plugDate.split("T").pop();
     plugDate = plugDate.substring(0,plugDate.length-1);
     var plugDateShort = plugDate.split(":")[0];
