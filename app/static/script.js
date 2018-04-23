@@ -65,8 +65,10 @@ function formsubmit(id, p=0, m=0, toDB = false){
             //Get options from the center object in options
     var centerConfig = chart.config.options.elements.center;
     var fontStyle = centerConfig.fontStyle || 'Arial';
-            var txt1 = centerConfig.text1;
-            var txt2 = centerConfig.text2;
+    var txt1 = centerConfig.text1;
+    var txt2 = centerConfig.text2;
+    var txt3 = centerConfig.text3;
+    var txt4 = centerConfig.text4;
     var color = centerConfig.color || '#000';
     var sidePadding = centerConfig.sidePadding || 20;
     var sidePaddingCalculated = (sidePadding/100) * (chart.innerRadius * 2)
@@ -94,8 +96,10 @@ function formsubmit(id, p=0, m=0, toDB = false){
     ctx.fillStyle = color;
 
     //Draw text in center
-    ctx.fillText(txt1, centerX, centerY-0.8*fontSizeToUse);
-    ctx.fillText(txt2, centerX, centerY+0.8*fontSizeToUse);
+    ctx.fillText(txt1, centerX, centerY-(2.0)*fontSizeToUse);
+    ctx.fillText(txt2, centerX, centerY-(0.4)*fontSizeToUse);
+    ctx.fillText(txt3, centerX, centerY+1.2*fontSizeToUse);
+	 ctx.fillText(txt4, centerX, centerY+2.8*fontSizeToUse);
         }
     }
 });
@@ -109,12 +113,14 @@ function setCharAt(str,index,chr) {
 function writeschedule(data, m){
     //Calculate length of single charge
     var hours = m/60;var mins = m%60;
-    var plugDate =data.data[2].plugInTime;
+    var plugDate =data.data[0].plugInTime;
+    var carbProd = data.data[0].carbonProduced;
+    var energy = data.data[0].energyConsumed;
     plugDate = plugDate.split("T").pop();
     plugDate = plugDate.substring(0,plugDate.length-1);
     var plugDateShort = plugDate.split(":")[0];
     var plugDateMins = plugDate.split(":")[1];
-    var plugDateTime = data.data[2].plugInTime;
+    var plugDateTime = data.data[0].plugInTime;
     plugDateTime = setCharAt(plugDateTime,10,' ');
     plugDateTime = setCharAt(plugDateTime,16,' ');
 
@@ -188,6 +194,8 @@ function writeschedule(data, m){
                     center: {
                         text1: "You should plug in at ",
                         text2: plugDateTime,
+                        text3: "Energy: " + energy + " kwh",
+                        text4: "Carbon: " + carbProd + " g/kwh",
                         fontStyle: 'Helvetica', // Default is Arial
                          sidePadding: 20 // Defualt is 20 (as a percentage)
                 }
