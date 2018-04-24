@@ -1,5 +1,5 @@
-var options =[{"text"  : "iPhone","value" : "iPhone", "power": "30", "minutes": "120"},
-    {"text"     : "Android","value"    : "Android",	"power":"70", "minutes":"300"},
+var options =[{"text"  : "iPhone","value" : "iPhone", "power": "0.012", "minutes": "100"},
+    {"text"     : "Android","value"    : "Android",	"power":"0.015", "minutes":"90"},
     {"text"  : "Custom","value" : "Custom", "power":"0", "minutes":"0"}
     ];
 
@@ -69,6 +69,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
     var txt2 = centerConfig.text2;
     var txt3 = centerConfig.text3;
     var txt4 = centerConfig.text4;
+    var txt5 = centerConfig.text5;
     var color = centerConfig.color || '#000';
     var sidePadding = centerConfig.sidePadding || 20;
     var sidePaddingCalculated = (sidePadding/100) * (chart.innerRadius * 2)
@@ -96,10 +97,11 @@ function formsubmit(id, p=0, m=0, toDB = false){
     ctx.fillStyle = color;
 
     //Draw text in center
-    ctx.fillText(txt1, centerX, centerY-(2.0)*fontSizeToUse);
-    ctx.fillText(txt2, centerX, centerY-(0.4)*fontSizeToUse);
-    ctx.fillText(txt3, centerX, centerY+1.2*fontSizeToUse);
-	 ctx.fillText(txt4, centerX, centerY+2.8*fontSizeToUse);
+    ctx.fillText(txt1, centerX, centerY-(2.4)*fontSizeToUse);
+    ctx.fillText(txt2, centerX, centerY-(0.8)*fontSizeToUse);
+    ctx.fillText(txt3, centerX, centerY+0.8*fontSizeToUse);
+	 ctx.fillText(txt4, centerX, centerY+2.4*fontSizeToUse);
+	 ctx.fillText(txt5, centerX, centerY+4.0*fontSizeToUse);
         }
     }
 });
@@ -112,7 +114,7 @@ function setCharAt(str,index,chr) {
 
 function writeschedule(data, m){
     //Calculate length of single charge
-    var hours = m/60;var mins = m%60;
+    var hours = m/60;
     var plugDate =data.data[0].plugInTime;
     var carbProd = data.data[0].carbonProduced;
     carbProd = Math.round(carbProd * 100) / 100;
@@ -126,14 +128,14 @@ function writeschedule(data, m){
     plugDateTime = setCharAt(plugDateTime,10,' ');
     plugDateTime = setCharAt(plugDateTime,16,' ');
 
-    var unplugShort = plugDateShort*1 + hours*1 + (1*plugDateMins + 1*mins)/60;
+    var unplugShort = plugDateShort*1 + hours*1 + (1*plugDateMins)/60;
 
     var numberCharging = [];
     var backgroundColors = [];
 
     //fakes numberCharging, I hope to get this from db
     for(var i = 0; i<24; i++){
-            if(i >= plugDateShort && i <= unplugShort)
+            if(i >= plugDateShort && i < unplugShort)
                 numberCharging.push(1);
             else
                 numberCharging.push(0);
@@ -197,7 +199,8 @@ function writeschedule(data, m){
                         text1: "You should plug in at ",
                         text2: plugDateTime,
                         text3: "Energy: " + energy + " kwh",
-                        text4: "Carbon: " + carbProd + " g/kwh",
+                        text4: "Carbon: " + Math.round(carbProd * energy * 100) / 100 + " g",
+                        text5: "@ " + carbProd + " g/kwh",
                         fontStyle: 'Helvetica', // Default is Arial
                          sidePadding: 20 // Defualt is 20 (as a percentage)
                 }
