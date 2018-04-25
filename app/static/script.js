@@ -1,3 +1,93 @@
+//Preventing redirects on form submittal
+$(function() {
+    $("#revokePass").on("submit", function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr("action"),
+            type: 'get',
+            data: $(this).serialize(),
+            success: function(data) {
+                $('#revokeSuccessAlert').show();
+             }
+        });
+    });
+});
+
+$(function() {
+    $("#edit").on("submit", function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr("action"),
+            type: 'post',
+            data: $(this).serialize(),
+            success: function(data) {
+                $('#editSuccessAlert').show();
+             }
+        });
+    });
+});
+
+$(function() {
+    $("#deleteAllDevices").on("submit", function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr("action"),
+            type: 'get',
+            data: $(this).serialize(),
+            success: function(data) {
+                $('#deleteAllAlert').show();
+                var el = document.getElementById('deviceList');
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'userDevices/get', true);
+                xhr.onload = function() {
+                deviceList = JSON.parse(xhr.response);
+                while (el.firstChild) {
+                    el.removeChild(el.firstChild);
+                }
+                if(deviceList.length > 0){
+                //Reset the form
+            
+
+                for(var i = 0; i<deviceList.length; i++){
+                    var node = document.createElement('li');
+                    node.className = "list-group-item";
+                    node.innerHTML = deviceList[i].deviceName +'<i class="js-remove">✖</i>';
+                    node.value = i;
+                    el.appendChild(node);
+                }
+            }
+            else
+            {
+                var textContent = document.createTextNode("No devices currently registered!");
+                el.appendChild(textContent);
+            }
+            }; 
+            xhr.send();
+
+             }
+        });
+    });
+});
+//Hides alerts when modal is closed
+$(function(){
+    $('#managePassModal').on('hide.bs.modal', function (e) {
+     $('#revokeSuccessAlert').hide();
+     $('#editSuccessAlert').hide();
+    });
+});
+
+
+//Reusable alerts
+$(function(){
+    $("[data-hide]").on("click", function(){
+        $("." + $(this).attr("data-hide")).hide();
+        // -or-, see below
+        // $(this).closest("." + $(this).attr("data-hide")).hide();
+    });
+});
+
+
 var options =[{"text"  : "iPhone","value" : "iPhone", "power": "0.012", "minutes": "100"},
     {"text"     : "Android","value"    : "Android",	"power":"0.015", "minutes":"90"},
     {"text"  : "Custom","value" : "Custom", "power":"0", "minutes":"0"}
@@ -41,9 +131,10 @@ function formsubmit(id, p=0, m=0, toDB = false){
             break;
 
         case "newdevice":
-            var form = document.getElementById('custdata');
+               var form = document.getElementById('custdata');
             if(toDB){
                 form.submit();
+                $('registerSuccessAlert').show();
             }
 
 
@@ -304,12 +395,12 @@ function showElList(){
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
         deviceList = JSON.parse(xhr.response);
-
-        if(deviceList.length > 0){
-            //Reset the form
-            while (el.firstChild) {
+        while (el.firstChild) {
                 el.removeChild(el.firstChild);
             }
+        if(deviceList.length > 0){
+            //Reset the form
+            
 
             for(var i = 0; i<deviceList.length; i++){
                 var node = document.createElement('li');
@@ -332,8 +423,7 @@ function showElList(){
     filter: '.js-remove',
     onFilter: function (evt) {
         var el = editableList.closest(evt.item); // get dragged item
-        console.log(el);
-        var deviceDelete = 'http://team10.pythonanywhere.com/userDevices/delete';
+        var deviceDelete = 'userDevices/delete';
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', deviceDelete + '/'+ deviceList[el.value].deviceName, true);
@@ -351,7 +441,7 @@ function showElList(){
 
 
 function loadOwnDevices(){
-    var deviceGet = 'http://team10.pythonanywhere.com/userDevices/get';
+    var deviceGet = 'userDevices/get';
     var deviceList = [];
     var el = document.getElementById('ownDevices');
 
