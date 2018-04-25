@@ -27,8 +27,16 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
   <a class="navbar-brand" href="/index.html">Eco-Scheduler</a>
+
+  <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+        <span class="navbar-toggler-icon"></span>
+  </button>
+
+
+      <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+
 
     <ul class="nav navbar-nav ml-auto">
         <li class="nav-item active" id="signIn">
@@ -41,22 +49,23 @@
             <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
         </li>
     </ul>
+  </div>
 </nav>
 
 
     <div class = "container" id = "container">
 
-        <div id="titletext" class="pricing-header px-3 py-3 mx-auto text-center">
-              <h2 class="display-4">Schedule a device</h2>
+        <div id="titletext" class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+              <h2>Schedule a device</h2>
               <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
         </div>
 
         <div class = "card-deck responsive restofscreen">
             <!-- Card 1 -->
             <div class = "card">
+               <h5 class = "card-header text-center"> Templates</h5>
                 <div class = "card-body">
                     <!--<img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='appleico.png')}}">-->
-                    <h5 class = "card-title text-center"> Templates</h5>
                       <div class="form-group">
                             <label for="templateDevices">Select the devices you want to schedule:</label>
                             <select class="form-control" id="templateDevices">
@@ -73,9 +82,9 @@
             </div>
             <!-- Card 2 -->
             <div class = "card">
+              <h5 class = "card-header text-center"> Your devices:</h5>
                 <div class = "card-body">
                    <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='androidico.png')}}"> -->
-                    <h5 class = "card-title text-center"> Your devices:</h5>
                     <div class="form-group">
                             <label for="ownDevices">Select the devices you want to schedule:</label>
                             <button type = "button" class = "btn" onclick="loadOwnDevices()">
@@ -90,9 +99,9 @@
             </div>
             <!-- Card 3 -->
             <div class = "card">
+              <h5 class = "card-header text-center"> Custom</h5>
                 <div class = "card-body ">
                    <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='custom.png')}}"> -->
-                    <h5 class = "card-title text-center"> Custom</h5>
                     <form id = "custdata" action="userDevices/add" method="POST">
                         <div class = "form-group">
                             <label for="inputName"> Device Name </label>

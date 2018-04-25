@@ -1,3 +1,4 @@
+
 .thumbnail {
     position: relative;
 }
@@ -47,4 +48,48 @@
   #deviceList li:hover i {
     opacity: 1;
   }
+
+/* For mobile */
+html,
+body {
+  overflow-x: hidden; /* Prevent scroll on narrow devices */
+}
+
+body {
+  padding-top: 56px;
+}
+
+
+/* Sidebar on mobile */
+@media (max-width: 767.98px) {
+  .offcanvas-collapse {
+    position: fixed;
+    top: 56px; /* Height of navbar */
+    bottom: 0;
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    overflow-y: auto;
+    background-color: var(--gray-dark);
+    transition: -webkit-transform .3s ease-in-out;
+    transition: transform .3s ease-in-out;
+    transition: transform .3s ease-in-out, -webkit-transform .3s ease-in-out;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+  }
+  .offcanvas-collapse.open {
+    -webkit-transform: translateX(-1rem);
+    transform: translateX(-1rem); /* Account for horizontal padding on navbar */
+  }
+}
+
+/* Heading was too large on mobile */
+@media screen and (max-width: 768px) {
+    h2{
+        font-size:24px;
+    }
+    p.lead {
+      font-size: 20px;
+    }
+}
 

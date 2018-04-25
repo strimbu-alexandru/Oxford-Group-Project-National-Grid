@@ -363,3 +363,12 @@ function loadOwnDevices(){
     el.removeChild(el.firstChild);}
 
 }
+
+//Showing collapsible sidebar
+$(function () {
+  'use strict'
+
+  $('[data-toggle="offcanvas"]').on('click', function () {
+    $('.offcanvas-collapse').toggleClass('open')
+  })
+})
