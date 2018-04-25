@@ -131,10 +131,23 @@ function formsubmit(id, p=0, m=0, toDB = false){
             break;
 
         case "newdevice":
-               var form = document.getElementById('custdata');
             if(toDB){
-                form.submit();
-                $('registerSuccessAlert').show();
+                $("#custdata").submit(function(e) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "userDevices/add",
+                    data: $("#custdata").serialize(), // serializes the form's elements.
+                    success: function(data)
+                    {
+                        $("#registerSuccessAlert").show();
+                    }
+                    });
+
+                 e.preventDefault(); // avoid to execute the actual submit of the form.
+                });
+
+                $("#custdata").submit();
             }
 
 
