@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Change Mobile Login </title>
+	</head>
+
+	<body>
+		<div style="text-align: center; padding: 2%;">
+			<p>Set a username and password for use on Mobile:</p>
+			
+			<form id = "edit" action="http://localhost:5000/auth/mobile/login/edit" method="POST">
+				<div class = "form-group">
+					<label for="username"> Username </label>
+					<input type="text" class = "form-control" name='username' placeholder="Enter username">
+					<br>
+					<br>
+					<label for="password"> Password </label>
+					<input type="password" class = "form-control" name = 'password' placeholder="Enter password">
+					<br>
+					<br>
+					<input type="submit">
+				</div>
+			</form>
+
+			<p>Revoke password access</p>
+			<a href="http://localhost:5000/auth/mobile/login/remove">Revoke</a>
+
+		</div>
+	</body>
+</html>
