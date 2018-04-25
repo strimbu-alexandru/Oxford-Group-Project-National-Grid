@@ -77,20 +77,88 @@ class Login(Resource):
 
 # Expire current token
 class Logout(Resource):
+	@login_required
 	def get(self):
-		if isAuthenticated():
+		authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
+		
+		# End the session
+		session.pop('JWT', None)
+
+		# Log user out in database
+		user = authMethods.findUserByToken(authToken)
+		user = authMethods.logUserOut(user)
+		return 'Logged out successfully.'
+
+
+# Login with username/password
+class MobileLogin(Resource):
+	def post(self):
+		if request.form:
+
+			username = request.form['username']
+			password = request.form['password']
+
+			# log the user in on the database
+			user = authMethods.findUserByUsername(username)
+
+			if authMethods.authenticateByPassword(user,password):
+				authToken = authMethods.generateToken()				# Get the new token
+				user = authMethods.logUserIn(user, authToken)
+
+				# Obtain the JWT to send back to client
+				JWToken = authMethods.getJWTfromAuthToken(authToken)
+
+				# Create a session for them
+				session['JWT'] = JWToken
+
+				return 'Logged in as: ' + user.name
+
+		return MobileLogin.get(self)
+
+	def get(self):
+		# Send to mobile login page
+		return output_html(render_template("login_mobile.html"), 200)
+
+
+class ChangeMobileLogin(Resource):
+	@login_required
+	def post(self):
+		if request.form:
+			# Find the user
 			authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
-			
-			# End the session
-			session.pop('JWT', None)
-
-			# Log user out in database
 			user = authMethods.findUserByToken(authToken)
-			user = authMethods.logUserOut(user)
-			return 'Logged out successfully.'
 
-		return 'User not logged in.'
+			# Get info from form
+			username = request.form['username']
+			password = request.form['password']
+
+			# Update user
+			authMethods.setUsernameAndPassword(user,username,password)
+
+			return 'username and password set successfully'
+
+		return ChangeMobileLogin.get(self)
+
+	@login_required
+	def get(self):
+		return output_html(render_template("login_mobile_change.html"), 200)
+
+class RemoveMobileLogin(Resource):
+	@login_required
+	def get(self):
+		# Find the user
+		authToken = authMethods.getAuthTokenFromJWT(session['JWT'])
+		user = authMethods.findUserByToken(authToken)
+
+		authMethods.removePassword(user)
+		return 'Password access revoked'
+
 
 api.add_resource(Home, '/')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
+
+# Mobile logins
+api.add_resource(MobileLogin, '/mobile/login')
+api.add_resource(ChangeMobileLogin, '/mobile/login/edit')
+api.add_resource(RemoveMobileLogin, '/mobile/login/remove')

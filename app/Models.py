@@ -22,12 +22,17 @@ class User(Base, DictSerializable):
 	name 			= Column(String(128))
 	authToken		= Column(String(128), unique = True)
 	tokenExpiryDate = Column(DateTime)
+	# For use with mobile app:
+	username		= Column(String(128), unique = True)
+	passwordHash	= Column(String(128))
 
 	def __init__(self, userId=None, name=None, authToken=None, tokenExpiryDate=None):
 		self.userId = userId
 		self.name = name
 		self.authToken = authToken
 		self.tokenExpiryDate = tokenExpiryDate
+		self.username = userId
+		self.passwordHash = ''
 
 	def __repr__(self):
 		return '<User %r>' % (self.name)

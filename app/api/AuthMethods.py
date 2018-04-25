@@ -5,6 +5,7 @@ from ast import literal_eval
 from jwcrypto import jwt, jwk, jwe
 from flask import request, session, url_for, redirect
 from jwcrypto.common import json_encode, json_decode
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.Models import User
 from app.Database import db_session
@@ -31,7 +32,13 @@ class authMethods():
 	def findUserByToken(authToken):
 		user = User.query.filter(User.authToken == authToken).first()
 		if user == None:
-			raise CustomError(authToken + ': user not found', 600)
+			raise CustomError('user not found - invalid token', 600)
+		return user
+
+	def findUserByUsername(username):
+		user = User.query.filter(User.username == username).first()
+		if user == None:
+			raise CustomError('user not found - invalid username', 600)
 		return user
 
 	# Updates authToken and tokenExpiryDate for given user and token
@@ -68,6 +75,10 @@ class authMethods():
 			if authMethods.checkValidity(authToken):
 				return True
 		return False
+
+	# Authenticate user with password
+	def authenticateByPassword(user, password):
+		return check_password_hash(user.passwordHash,password)
 
 	# Generate a random token for the user
 	# Prefix with the time it is generated at to ensure uniqeness
@@ -115,3 +126,18 @@ class authMethods():
 		authToken = payload['authToken']
 
 		return authToken
+
+	def setUsernameAndPassword(user,username,password):
+		# Make sure the username is unique
+		clashes = User.query.filter(User.username == username).all()
+		if not (clashes == [] or clashes == [user]):
+			raise CustomError('username already taken', 600)
+
+		user.username = username
+		user.passwordHash = generate_password_hash(password)
+		db_session.commit()
+		return user
+
+	def removePassword(user):
+		user.passwordHash = ''
+		db_session.commit()
