@@ -93,3 +93,10 @@ body {
     }
 }
 
+/* Cleaner modals? */
+.modal-backdrop
+{
+    opacity:0.7 !important;
+}
+
+

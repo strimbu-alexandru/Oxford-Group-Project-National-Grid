@@ -226,16 +226,22 @@ function writeschedule(data, m){
 
 
 function onSignIn(googleUser) {
-                var loginHandler = 'http://team10.pythonanywhere.com/auth/login';
+                var loginHandler = 'auth/login';
 
     var profile = googleUser.getBasicProfile();
     var signInButton = document.getElementById("signIn");
-    var signOutText = document.getElementById("signOut");
-    var manageLink = document.getElementById("manage");
-
+    var loggedInElements = document.getElementsByClassName("view-loggedin");
+    var disabledElements = document.getElementsByClassName("disabled-logout");
     signInButton.style.display="none";
-    signOutText.style.display="block";
-    manageLink.style.display="block";
+    for(var i = 0; i < loggedInElements.length; i++){
+        loggedInElements[i].style.display="block";
+    }
+
+    for(var i = 0; i < disabledElements.length; i++){
+        disabledElements[i].disabled=false;
+    }
+
+
 
     console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
     console.log('Name: ' + profile.getName());
@@ -256,18 +262,23 @@ function onSignIn(googleUser) {
 
 function signOut() {
 
-    var logoutHandler = 'http://team10.pythonanywhere.com/auth/logout'
+    var logoutHandler = 'auth/logout'
 
     var auth2 = gapi.auth2.getAuthInstance();
                 auth2.signOut().then(function () {
                     console.log('User signed out.');
                 });
     var signInButton = document.getElementById("signIn");
-    var signOutText = document.getElementById("signOut");
-    var manageLink = document.getElementById("manage");
+    var loggedInElements = document.getElementsByClassName("view-loggedin");
+    var disabledElements = document.getElementsByClassName("disabled-logout");
     signInButton.style.display="block";
-    signOutText.style.display="none";
-    manageLink.style.display="none";
+    for(var i = 0; i < loggedInElements.length; i++){
+        loggedInElements[i].style.display="none";
+    }
+
+    for(var i = 0; i < disabledElements.length; i++){
+        disabledElements[i].disabled=true;
+    }
 
     // tell server to sign user out
     var xhr = new XMLHttpRequest();
@@ -279,10 +290,13 @@ function signOut() {
     xhr.send();
 }
 
+function showPassManager(){
+    $('#managePassModal').modal('show');
+}
 
 function showElList(){
     var el = document.getElementById('deviceList');
-    var deviceGet = 'http://team10.pythonanywhere.com/userDevices/get';
+    var deviceGet = 'userDevices/get';
 
     var deviceList = [];
 
