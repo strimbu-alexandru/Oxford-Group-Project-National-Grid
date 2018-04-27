@@ -37,7 +37,7 @@ $(function() {
             success: function(data) {
                 $('#deleteAllAlert').show();
                 var el = document.getElementById('deviceList');
-                
+
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', 'userDevices/get', true);
                 xhr.onload = function() {
@@ -47,7 +47,7 @@ $(function() {
                 }
                 if(deviceList.length > 0){
                 //Reset the form
-            
+
 
                 for(var i = 0; i<deviceList.length; i++){
                     var node = document.createElement('li');
@@ -62,7 +62,7 @@ $(function() {
                 var textContent = document.createTextNode("No devices currently registered!");
                 el.appendChild(textContent);
             }
-            }; 
+            };
             xhr.send();
 
              }
@@ -98,6 +98,8 @@ function formsubmit(id, p=0, m=0, toDB = false){
 
     switch(id){
         case "template":
+            $("#registerSuccessAlert").hide();
+            $("#registerUsedAlert").hide();
             var vals = $('#templateDevices').val() || [];
             var listDevs = [];
 
@@ -113,6 +115,8 @@ function formsubmit(id, p=0, m=0, toDB = false){
             break;
 
         case "owndevice":
+            $("#registerSuccessAlert").hide();
+            $("#registerUsedAlert").hide();
             var vals = $.parseJSON($('#ownDevices option:selected').val());
             /*var listDevs = [];
             for(var i =0; i<vals.length; i++)
@@ -131,6 +135,8 @@ function formsubmit(id, p=0, m=0, toDB = false){
             break;
 
         case "newdevice":
+            $("#registerSuccessAlert").hide();
+            $("#registerUsedAlert").hide();
             if(toDB){
                 $("#custdata").submit(function(e) {
 
@@ -140,7 +146,10 @@ function formsubmit(id, p=0, m=0, toDB = false){
                     data: $("#custdata").serialize(), // serializes the form's elements.
                     success: function(data)
                     {
-                        $("#registerSuccessAlert").show();
+                        if(data == "success")			//different messages for success or name already in use
+                            $("#registerSuccessAlert").show();
+                        if(data == "used")
+                            $("#registerUsedAlert").show();
                     }
                     });
 
@@ -413,7 +422,7 @@ function showElList(){
             }
         if(deviceList.length > 0){
             //Reset the form
-            
+
 
             for(var i = 0; i<deviceList.length; i++){
                 var node = document.createElement('li');
