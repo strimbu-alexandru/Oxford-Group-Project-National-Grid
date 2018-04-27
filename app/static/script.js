@@ -136,7 +136,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
 
         case "newdevice":
             $("#registerSuccessAlert").hide();
-            $("#registerUsedAlert").hide();
+				$("#registerUsedAlert").show();
             if(toDB){
                 $("#custdata").submit(function(e) {
 
@@ -147,9 +147,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
                     success: function(data)
                     {
                         if(data == "success")			//different messages for success or name already in use
-                            $("#registerSuccessAlert").show();
-                        if(data == "used")
-                            $("#registerUsedAlert").show();
+                            {$("#registerUsedAlert").hide(); $("#registerSuccessAlert").show()}
                     }
                     });
 
