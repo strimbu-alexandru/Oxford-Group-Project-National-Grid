@@ -105,7 +105,19 @@ function formsubmit(id, p=0, m=0, toDB = false){
 
             var p = options[vals[0]].power;
             var m = options[vals[0]].minutes;
-                $.ajax('./server/best24h/'+p+'/'+m, {
+            var radios = document.getElementsByName('periodTemplate');
+            
+            var api = ""
+
+				for (var i = 0, length = radios.length; i < length; i++)
+				{
+ 					if (radios[i].checked)
+ 					{
+  						api = radios[i].value
+  						break;
+ 					}
+				}
+                $.ajax('./server/' + api + '/'+p+'/'+m, {
                 success: function(data) {
                 //listDevs.push({'data': data, 'm':m});
                 writeschedule(data, m);
@@ -117,27 +129,46 @@ function formsubmit(id, p=0, m=0, toDB = false){
         case "owndevice":
             $("#registerSuccessAlert").hide();
             $("#registerUsedAlert").hide();
+            var radios = document.getElementsByName('periodOwn');
+            
+            var api = ""
+
+				for (var i = 0, length = radios.length; i < length; i++)
+				{
+ 					if (radios[i].checked)
+ 					{
+  						api = radios[i].value
+  						break;
+ 					}
+				}
             var vals = $.parseJSON($('#ownDevices option:selected').val());
-            /*var listDevs = [];
-            for(var i =0; i<vals.length; i++)
-            {*/
                 var p = vals.power;
                 var m = vals.minutes;
-                $.ajax('./server/best24h/'+p+'/'+m, {
+                $.ajax('./server/' + api + '/'+p+'/'+m, {
                 success: function(data) {
-                //listDevs.push({'data': data, 'm':m});
                 writeschedule(data, m);
             }
             }
             );
-            //}
-            //writeschedule(listDevs);
             break;
 
         case "newdevice":
             $("#registerSuccessAlert").hide();
-				$("#registerUsedAlert").show();
+				$("#registerUsedAlert").hide();
+				var radios = document.getElementsByName('periodNew');
+            
+            var api = ""
+
+				for (var i = 0, length = radios.length; i < length; i++)
+				{
+ 					if (radios[i].checked)
+ 					{
+  						api = radios[i].value
+  						break;
+ 					}
+				}
             if(toDB){
+            	$("#registerUsedAlert").show();
                 $("#custdata").submit(function(e) {
 
                 $.ajax({
@@ -158,7 +189,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
             }
 
 
-            $.ajax('./server/best24h/'+p+'/'+m, {
+            $.ajax('./server/' + api + '/'+p+'/'+m, {
             success: function(data) {
                 //var listDevs = [{'data': data, 'm':m}];
                 writeschedule(data,m);
