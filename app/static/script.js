@@ -90,7 +90,9 @@ $(function(){
 
 var options =[{"text"  : "iPhone","value" : "iPhone", "power": "0.012", "minutes": "100"},
     {"text"     : "Android","value"    : "Android",	"power":"0.015", "minutes":"90"},
-    {"text"  : "Custom","value" : "Custom", "power":"0", "minutes":"0"}
+    {"text"     : "Tesla",  "value"    : "Tesla",     "power":"120",   "minutes":"75"},
+    {"text"     : "Wahing machine", "value" : "Washing machine", "power": "0.5", "minutes" : "100"},
+    {"text"     : "Custom", "value" : "Custom",       "power":"0", "minutes":"0"}
     ];
 
 

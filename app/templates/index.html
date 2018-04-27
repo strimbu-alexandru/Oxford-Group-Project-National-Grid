@@ -73,7 +73,9 @@
                             <label for="templateDevices">Select the devices you want to schedule:</label>
                             <select class="form-control" id="templateDevices">
                             <option value='0'>iPhone</option>
-                            <option value='1'}>Android</option>
+                            <option value='1'>Android</option>
+                            <option value='2'>Tesla</option>
+                            <option value='3'>Washing machine</option>
                             </select>
                             <br>
                             <label for="templateDevices">Select the period for charging/using:</label> <br>
@@ -118,9 +120,9 @@
                             <label for="inputName"> Device Name </label>
                             <input type="text" class = "form-control" name='name' id='inputName' placeholder="Enter device name">
                             <label for="inputPower"> Power </label>
-                            <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kWh)">
-                            <label for="inputMinutes"> Minutes required to charge </label>
-                            <input type="text" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes">
+                            <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kW)">
+                            <label for="inputMinutes"> Minutes required to charge/use </label>
+                            <input type="number" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
                             <div class = "form-check">
                             <input type="checkbox" class="form-check-input disabled-logout" id="submitCheck" disabled = "disabled">
                             <label class="form-check-label" for="submitCheck">Register device</label>

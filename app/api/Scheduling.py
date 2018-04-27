@@ -33,7 +33,8 @@ class BestTime24h(Resource):
 		data = BestTime24h.get_data()	#get the data for the next 24h from now
 		minCarbon = 1000000
 		minCarbonTime = data['data'][0]['from']
-		for i in range (0, 48 - intervals):		#go through the data and choose a period with the minimum carbon consumed
+		size = len(data['data'])
+		for i in range (0, size - intervals):		#go through the data and choose a period with the minimum carbon consumed
 			carbon = 0
 			for j in range (0, intervals):
 				carbon += data['data'][i + j]['intensity']['forecast'] * power * 0.5
@@ -60,7 +61,8 @@ class BestTime48h(Resource):
 		data = BestTime48h.get_data()	#get the data for the next 24h from now
 		minCarbon = 1000000
 		minCarbonTime = data['data'][0]['from']
-		for i in range (0, 93 - intervals):		#go through the data and choose a period with the minimum carbon consumed
+		size = len(data['data'])
+		for i in range (0, size - intervals):		#go through the data and choose a period with the minimum carbon consumed
 			carbon = 0
 			for j in range (0, intervals):
 				carbon += data['data'][i + j]['intensity']['forecast'] * power * 0.5
