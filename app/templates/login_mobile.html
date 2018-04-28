@@ -5,10 +5,15 @@
 	</head>
 
 	<body>
+		{% if error %}
+		<div align = "center" >
+     	   <p><strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
 		<div style="text-align: center; padding: 2%;">
 			<p>Sign in for mobile:</p>
 			
-			<form id = "login" action="auth/mobile/login" method="POST">
+			<form id = "login" action="/auth/mobile/login" method="POST">
 				<div class = "form-group">
 					<label for="username"> Username </label>
 					<input type="text" class = "form-control" name='username' placeholder="Enter username">

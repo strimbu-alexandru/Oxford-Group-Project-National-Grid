@@ -31,14 +31,10 @@ class authMethods():
 
 	def findUserByToken(authToken):
 		user = User.query.filter(User.authToken == authToken).first()
-		if user == None:
-			raise CustomError('user not found - invalid token', 600)
 		return user
 
 	def findUserByUsername(username):
 		user = User.query.filter(User.username == username).first()
-		if user == None:
-			raise CustomError('user not found - invalid username', 600)
 		return user
 
 	# Updates authToken and tokenExpiryDate for given user and token
