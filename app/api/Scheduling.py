@@ -42,7 +42,12 @@ class BestTime24h(Resource):
 			if carbon < minCarbon:
 				minCarbon = carbon
 				minCarbonTime = data['data'][i]['from']
-		result = {'data': [{'energyConsumed': str(kwh), 'carbonProduced': str(minCarbon/kwh), 'plugInTime': str(minCarbonTime)}]}
+		carbonNow = 0
+		for i in range (0, intervals):				#compute carbon produced if plugged-in now
+			carbonNow += data['data'][i]['intensity']['forecast'] * power * 0.5
+		carbonNow += data['data'][i + intervals]['intensity']['forecast'] * power * (timeMin - 30 * intervals) / 30 * 0.5
+		carbonRed = carbonNow - minCarbon
+		result = {'data': [{'energyConsumed': str(kwh), 'carbonProduced': str(minCarbon/kwh), 'plugInTime': str(minCarbonTime), 'carbonReduced': str(carbonRed)}]} #note that the carbon produced is in g/kwh, but the carbon reduced is in g (so no need to multiply with kwh)
 		return jsonify(result)	#return a json with the data
 		
 class BestTime48h(Resource):
@@ -70,7 +75,12 @@ class BestTime48h(Resource):
 			if carbon < minCarbon:
 				minCarbon = carbon
 				minCarbonTime = data['data'][i]['from']
-		result = {'data': [{'energyConsumed': str(kwh), 'carbonProduced': str(minCarbon/kwh), 'plugInTime': str(minCarbonTime)}]}
+		carbonNow = 0
+		for i in range (0, intervals):				#compute carbon produced if plugged-in now
+			carbonNow += data['data'][i]['intensity']['forecast'] * power * 0.5
+		carbonNow += data['data'][i + intervals]['intensity']['forecast'] * power * (timeMin - 30 * intervals) / 30 * 0.5
+		carbonRed = carbonNow - minCarbon
+		result = {'data': [{'energyConsumed': str(kwh), 'carbonProduced': str(minCarbon/kwh), 'plugInTime': str(minCarbonTime), 'carbonReduced': str(carbonRed)}]}   #note that the carbon produced is in g/kwh, but the carbon reduced is in g (so no need to multiply with kwh)
 		return jsonify(result)	#return a json with the data
 
 api.add_resource(BestTime24h, '/server/best24h/<powerGET>/<timeMinGET>')
