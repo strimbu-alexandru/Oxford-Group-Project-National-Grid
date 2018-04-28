@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 
 from app.Models import UserDevice, User
 from app.api.AuthMethods import authMethods
+from app.api.ChargingSlots import ChargingSlotMethods
 from app.Database import db_session
 from app.ErrorHandler import CustomError
 from config import Config
@@ -51,8 +52,9 @@ class DeleteUserDevice(Resource):					#deletes an entry based on userId and devi
 	def get(self, deviceName):
 		userId = getUserId()
 		userDevice = UserDevice.query.filter(UserDevice.userId == userId, UserDevice.deviceName == deviceName).first()
-		if userDevice != None :						#check if the user device exists
-			db_session.delete(userDevice)			#then delete it
+		if userDevice != None :													#check if the user device exists
+			ChargingSlotMethods.removeSlotByDevice(userDevice.deviceId, userId)	#delete any associated charging slots
+			db_session.delete(userDevice)										#then delete device
 			db_session.commit()
 			return "Device deleted successfully!"
 		return "Device not found in the database!"
@@ -63,6 +65,8 @@ class DeleteAllUserDevices(Resource):				#deletes all the devices for a user
 		userId = getUserId()
 		userDevices = UserDevice.query.filter(UserDevice.userId == userId).all()    #get all the devices
 		for item in userDevices :
+			# Delete associated charging slots
+			ChargingSlotMethods.removeSlotByDevice(item.deviceId, userId)
 			db_session.delete(item)
 		db_session.commit()
 		return "Devices deleted successfully"
