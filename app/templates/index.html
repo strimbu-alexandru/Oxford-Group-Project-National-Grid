@@ -43,10 +43,7 @@
             <div class="g-signin2"  data-onsuccess="onSignIn" style="display: inline-block;"></div>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
-            <a class="nav-link" href='#' onclick="showPassManager()"> Manage mobile login </a>
-        </li>
-        <li class="nav-item active view-loggedin" style="display:none">
-            <a class="nav-link" href="#" onclick="showElList()"> Manage devices</a>
+            <a class="nav-link" href='#' onclick="showPassManager()"> Manage profile </a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
@@ -56,120 +53,39 @@
 </nav>
 
 
-    <div class = "container" id = "container">
+<div class = "container" id = "container">
+  <!-- Title -->
+  <div id="titletext" class="pt-3 mx-auto text-center">
+    <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
+  </div>
 
-        <div id="titletext" class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-              <h2>Schedule a device</h2>
-              <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
+  
+  <div class="row">
+    <div class="col-12 col-md-8">
+      <!-- Card containing visualiser -->
+      <div class = "card">
+        <h5 class = "card-header text-center"> Charging schedule </h5>
+        <div class = "card-body">
+          
+          <!-- Visualiser goes here -->
+            <div id="scedulerContainer">
+              <canvas id='schedulerchart' width='400' height='400'></canvas>
+            </div>
         </div>
+      </div>
+    </div>
 
-        <div class = "card-deck responsive restofscreen">
-            <!-- Card 1 -->
-            <div class = "card">
-               <h5 class = "card-header text-center"> Templates</h5>
-                <div class = "card-body">
-                    <!--<img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='appleico.png')}}">-->
-                      <div class="form-group">
-                            <label for="templateDevices">Select the devices you want to schedule:</label>
-                            <select class="form-control" id="templateDevices">
-                            <option value='0'>iPhone</option>
-                            <option value='1'>Android</option>
-                            <option value='2'>Tesla</option>
-                            <option value='3'>Washing machine</option>
-                            </select>
-                            <br>
-                            <label for="templateDevices">Select the period for charging/using:</label> <br>
-                            <input type = "radio" name = "periodTemplate" value = "best24h" checked> 24 hours<br>
-                            <input type = "radio" name = "periodTemplate" value = "best48h"> 48 hours<br>
-                       </div>
-                  
-                </div>
-                <div class="card-footer">
-                    
-                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit('template')"> Schedule</button>
-                  </div>
+    <div class="col-6 col-md-4">
+        <!-- Devices that are currently being shown -->
+        <div class="card">
+          <h5 class = "card-header text-center"> Currently showing </h5>
+          <div class="card-body">
+              <!-- -->
+              Currently scheduled devices go here
+              <button type = "button" class = "btn btn-block btn-outline-primary" onclick = "showElList()">Manage devices</button>
             </div>
-            <!-- Card 2 -->
-            <div class = "card">
-              <h5 class = "card-header text-center"> Your devices:</h5>
-                <div class = "card-body">
-                   <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='androidico.png')}}"> -->
-                    <div class="form-group">
-                            <label for="ownDevices">Select the devices you want to schedule:</label>
-                            <button type = "button" class = "btn btn-secondary disabled-logout" onclick="loadOwnDevices()" disabled>
-                        Load own devices</button><BR><BR>
-                            <select  class="form-control disabled-logout" id="ownDevices" disabled>
-                            </select>
-                            <br>
-                            <label for="templateDevices">Select the period for charging/using:</label> <br>
-                            <input type = "radio" name = "periodOwn" value = "best24h" checked> 24 hours<br>
-                            <input type = "radio" name = "periodOwn" value = "best48h"> 48 hours<br>
-                       </div>
-                </div>
-                <div class="card-footer">
-                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary disabled-logout" onclick = "formsubmit('owndevice')" disabled> Schedule</button>
-                </div>
-            </div>
-            <!-- Card 3 -->
-            <div class = "card">
-              <h5 class = "card-header text-center"> Custom</h5>
-                <div class = "card-body ">
-                   <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='custom.png')}}"> -->
-                    <form id = "custdata" action="userDevices/add" method="POST">
-                        <div class = "form-group">
-                            <label for="inputName"> Device Name </label>
-                            <input type="text" class = "form-control" name='name' id='inputName' placeholder="Enter device name">
-                            <label for="inputPower"> Power </label>
-                            <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kW)">
-                            <label for="inputMinutes"> Minutes required to charge/use </label>
-                            <input type="number" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
-                            <div class = "form-check">
-                            <input type="checkbox" class="form-check-input disabled-logout" id="submitCheck" disabled = "disabled">
-                            <label class="form-check-label" for="submitCheck">Register device</label>
-                        </div>
-                        <br>
-                            <label for="templateDevices">Select the period for charging/using:</label> <br>
-                            <input type = "radio" name = "periodNew" value = "best24h" checked> 24 hours<br>
-                            <input type = "radio" name = "periodNew" value = "best48h"> 48 hours<br>
-                    </form>
-                    </div>
-                    
-            </div>
-            <div class='card-footer'>
-                        <button type = "button" 
-                        class = "btn btn-lg btn-block btn-outline-primary"
-                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value, document.getElementById('submitCheck').checked)"> Schedule</button>
-                        </div>
-                </div>
-        </div>
+          </div>
 
-    </div>
-	
-<!-- Modal for results -->
-<div class="modal bd-example-modal-lg" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-      	<h3 class="modal-title">Results</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-      </div>
-      <div class="modal-body" id="resultsModalBody">
-        <div class="alert alert-success alert-dismissible" id="registerSuccessAlert" role="alert" style="display:none">
-      <strong>Device registered succesfully.</strong> You can now use this device as a template.
-      <button type="button" class="close" data-hide="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="alert alert-success alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
-      <strong>Device name already registered.</strong> Choose a new name for your device
-      <button type="button" class="close" data-hide="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-        <div id="scedulerContainer">
-        <canvas id='schedulerchart' width='500' height='500'></canvas>
-      </div>
-      </div>
     </div>
   </div>
 </div>
@@ -182,21 +98,68 @@
         <h3 class="modal-title">Manage devices</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
+
       <div class="modal-body" id="manageModalBody">
-        <h5> Delete devices here.</h5>
-        <ul class="list-group" id="deviceList">
-            <!-- Elements will be populated here -->
-        </ul>
-      <h5>Delete all devices</h5>
-      <form id = "deleteAllDevices" action="userDevices/deleteAll" method="GET">
-      <button type="submit" class="btn btn-danger">Delete all</button>
-      </form>
-      <div class="alert alert-success alert-dismissible" id="deleteAllAlert" role="alert" style="display:none">
-      <strong>Device list cleared.</strong> All your devices have been removed from the database.
-      <button type="button" class="close" data-hide="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
+        <div class="container">
+          <div class="row">
+
+            <div class="col">
+              <h5> Delete devices here.</h5>
+              <ul class="list-group" id="deviceList">
+                <!-- Elements will be populated here -->
+              </ul>
+              <form class="pt-1" id = "deleteAllDevices" action="userDevices/deleteAll" method="GET">
+                <button type="submit" class="btn btn-danger">Delete all</button>
+              </form>
+              <div class="alert alert-success alert-dismissible" id="deleteAllAlert" role="alert" style="display:none">
+                <strong>Device list cleared.</strong> All your devices have been removed from the database.
+                <button type="button" class="close" data-hide="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="col border-left">
+              <h5> Register a new device. </h5>
+              <!-- Alert for successful scheduling of device -->
+              <div class="alert alert-success alert-dismissible" id="registerSuccessAlert" role="alert" style="display:none">
+                <strong>Device registered succesfully.</strong> You can now use this device as a template.
+                <button type="button" class="close" data-hide="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <!-- Device name duplicate alert -->
+              <div class="alert alert-success alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
+                <strong>Device name already registered.</strong> Choose a new name for your device
+                <button type="button" class="close" data-hide="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+
+              <form id = "custdata" action="userDevices/add" method="POST">
+                <div class = "form-group">
+                  <label for="inputName"> Device Name </label>
+                  <input type="text" class = "form-control" name='name' id='inputName' placeholder="Enter device name">
+                  <label for="inputPower"> Power </label>
+                  <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kW)">
+                  <label for="inputMinutes"> Minutes required to charge/use </label>
+                  <input type="number" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
+                  <div class = "form-check">
+                    <input type="checkbox" class="form-check-input disabled-logout" id="submitCheck" disabled = "disabled">
+                    <label class="form-check-label" for="submitCheck">Register device</label>
+                  </div>
+                  <label for="templateDevices">Select the period for charging/using:</label> <br>
+                    <input type = "radio" name = "periodNew" value = "best24h" checked> 24 hours<br>
+                    <input type = "radio" name = "periodNew" value = "best48h"> 48 hours<br>
+                  </div>
+              </form>
+              <button type = "button" 
+                        class = "btn btn-lg btn-block btn-outline-primary"
+                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value, document.getElementById('submitCheck').checked)"> Register</button>
+              </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -207,40 +170,51 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">Manage mobile password</h3>
+        <h3 class="modal-title">Your profile</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="manageModalBody">
-        <h5>Set a username and password for use on Mobile:</h5>
-        <form  id = "edit" action="auth/mobile/login/edit" method="POST">
-        <div class = "form-group">
-          <label for="username"> Username </label>
-          <input type="text" class = "form-control" name='username' placeholder="Enter username">
-          <label for="password"> Password </label>
-          <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <div class="alert alert-success alert-dismissible" id="editSuccessAlert" role="alert" style="display:none">
-            <strong>Username and password set.</strong> You can now log in on the mobile app.
-            <button type="button" class="close" data-hide="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          </div>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="media">
+                <img class="img-thumbnail" alt="User avatar" id = "userAvatar">
+                <div class="media-body" id="profileOptions">
+                  <h5 class="px-2"> Currently signed in as</h5>
+                </div>
+              </div>
+            </div>
 
-      </form>
-      <h5>Revoke password access</h5>
-      <form id = "revokePass" action="auth/mobile/login/remove" method="GET">
-      <button type="submit" class="btn btn-danger">Revoke</button>
-      </form>
-      <div class="alert alert-success alert-dismissible" id="revokeSuccessAlert" role="alert" style="display:none">
-      <strong>Password revoked.</strong> Session closed on the mobile app.
-      <button type="button" class="close" data-hide="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-
-    </div>
-  </div>
+            <div class="col-md-5 border-left">
+              <h5>Set a username and password for use on mobile:</h5>
+              <form  id = "edit" action="auth/mobile/login/edit" method="POST">
+              <div class = "form-group">
+                <label for="username"> Username </label>
+                <input type="text" class = "form-control" name='username' placeholder="Enter username">
+                <label for="password"> Password </label>
+                <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
+                  <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                  <div class="alert alert-success alert-dismissible" id="editSuccessAlert" role="alert" style="display:none">
+                    <strong>Username and password set.</strong> You can now log in on the mobile app.
+                    <button type="button" class="close" data-hide="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
+              <form id = "revokePass" action="auth/mobile/login/remove" method="GET">
+               <button type="submit" class="btn btn-danger">Revoke mobile password</button>
+              </form>
+              <div class="alert alert-success alert-dismissible" id="revokeSuccessAlert" role="alert" style="display:none">
+                <strong>Password revoked.</strong> Session closed on the mobile app.
+                <button type="button" class="close" data-hide="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+     </div>
   </div>
 </div>
 
