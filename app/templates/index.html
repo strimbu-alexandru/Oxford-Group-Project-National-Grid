@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang = "en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="google-signin-client_id" content="395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleusercontent.com">
-	<title>National Grid Eco-scheduler</title>
+  <title>National Grid Eco-scheduler</title>
 
-	<!-- bootstrap -->
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!-- bootstrap -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
 
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-	<script src ="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+  <script src ="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
      <script type="text/javascript" src="{{url_for('.static', filename='script.js')}}"></script>
@@ -43,7 +43,10 @@
             <div class="g-signin2"  data-onsuccess="onSignIn" style="display: inline-block;"></div>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
-            <a class="nav-link" href='#' onclick="showPassManager()"> Manage profile </a>
+            <a class="nav-link" href='#' onclick="showPassManager()"> Manage user profile</a>
+        </li>
+        <li class="nav-item active view-loggedin" style="display:none">
+            <a class="nav-link" href="#" onclick="showElList()"> Manage devices</a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
@@ -53,39 +56,116 @@
 </nav>
 
 
-<div class = "container" id = "container">
-  <!-- Title -->
-  <div id="titletext" class="pt-3 mx-auto text-center">
-    <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
-  </div>
+    <div class = "container" id = "container">
 
-  
-  <div class="row">
-    <div class="col-12 col-md-8">
-      <!-- Card containing visualiser -->
-      <div class = "card">
-        <h5 class = "card-header text-center"> Charging schedule </h5>
-        <div class = "card-body">
-          
-          <!-- Visualiser goes here -->
-            <div id="scedulerContainer">
-              <canvas id='schedulerchart' width='400' height='400'></canvas>
-            </div>
+        <div id="titletext" class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+              <h2>Schedule a device</h2>
+              <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
         </div>
-      </div>
-    </div>
 
-    <div class="col-6 col-md-4">
-        <!-- Devices that are currently being shown -->
-        <div class="card">
-          <h5 class = "card-header text-center"> Currently showing </h5>
-          <div class="card-body">
-              <!-- -->
-              Currently scheduled devices go here
-              <button type = "button" class = "btn btn-block btn-outline-primary" onclick = "showElList()">Manage devices</button>
+        <div class = "card-deck responsive restofscreen">
+            <!-- Card 1 -->
+            <div class = "card">
+               <h5 class = "card-header text-center"> Templates</h5>
+                <div class = "card-body">
+                    <!--<img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='appleico.png')}}">-->
+                      <div class="form-group">
+                            <label for="templateDevices">Select the devices you want to schedule:</label>
+                            <select class="form-control" id="templateDevices">
+                            <option value='0'>iPhone</option>
+                            <option value='1'>Android</option>
+                            <option value='2'>Tesla</option>
+                            <option value='3'>Washing machine</option>
+                            </select>
+                            <br>
+                            <label for="templateDevices">Select the period for charging/using:</label> <br>
+                            <input type = "radio" name = "periodTemplate" value = "best24h" checked> 24 hours<br>
+                            <input type = "radio" name = "periodTemplate" value = "best48h"> 48 hours<br>
+                       </div>
+                  
+                </div>
+                <div class="card-footer">
+                    
+                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary" onclick = "formsubmit('template')"> Schedule</button>
+                  </div>
             </div>
-          </div>
+            <!-- Card 2 -->
+            <div class = "card">
+              <h5 class = "card-header text-center"> Your devices:</h5>
+                <div class = "card-body">
+                   <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='androidico.png')}}"> -->
+                    <div class="form-group">
+                            <label for="ownDevices">Select the devices you want to schedule:</label>
+                            <button type = "button" class = "btn btn-secondary disabled-logout" onclick="loadOwnDevices()" disabled>
+                        Load own devices</button><BR><BR>
+                            <select  class="form-control disabled-logout" id="ownDevices" disabled>
+                            </select>
+                            <br>
+                            <label for="templateDevices">Select the period for charging/using:</label> <br>
+                            <input type = "radio" name = "periodOwn" value = "best24h" checked> 24 hours<br>
+                            <input type = "radio" name = "periodOwn" value = "best48h"> 48 hours<br>
+                       </div>
+                </div>
+                <div class="card-footer">
+                    <button type = "button" class = "btn btn-lg btn-block btn-outline-primary disabled-logout" onclick = "formsubmit('owndevice')" disabled> Schedule</button>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class = "card">
+              <h5 class = "card-header text-center"> Custom</h5>
+                <div class = "card-body ">
+                   <!-- <img class = "card-img-top img-fluid" src = "{{url_for('.static', filename='custom.png')}}"> -->
+                    <form id = "custdata" action="userDevices/add" method="POST">
+                        <div class = "form-group">
+                            <label for="inputName"> Device Name </label>
+                            <input type="text" class = "form-control" name='name' id='inputName' placeholder="Enter device name">
+                            <label for="inputPower"> Power </label>
+                            <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kW)">
+                            <label for="inputMinutes"> Minutes required to charge/use </label>
+                            <input type="number" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
+                        <br>
+                            <label for="templateDevices">Select the period for charging/using:</label> <br>
+                            <input type = "radio" name = "periodNew" value = "best24h" checked> 24 hours<br>
+                            <input type = "radio" name = "periodNew" value = "best48h"> 48 hours<br>
+                    </form>
+                    </div>
+                    
+            </div>
+            <div class='card-footer'>
+                        <button type = "button" 
+                        class = "btn btn-lg btn-block btn-outline-primary"
+                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value)"> Schedule</button>
+                        </div>
+                </div>
+        </div>
 
+    </div>
+  
+<!-- Modal for results -->
+<div class="modal bd-example-modal-lg" id="resultsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Results</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body" id="resultsModalBody">
+        <div class="alert alert-success alert-dismissible" id="registerSuccessAlert" role="alert" style="display:none">
+      <strong>Device registered succesfully.</strong> You can now use this device as a template.
+      <button type="button" class="close" data-hide="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="alert alert-success alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
+      <strong>Device name already registered.</strong> Choose a new name for your device
+      <button type="button" class="close" data-hide="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+        <div id="scedulerContainer">
+        <canvas id='schedulerchart' width='500' height='500'></canvas>
+      </div>
+      </div>
     </div>
   </div>
 </div>
@@ -129,7 +209,7 @@
                 </button>
               </div>
               <!-- Device name duplicate alert -->
-              <div class="alert alert-success alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
+              <div class="alert alert-danger alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
                 <strong>Device name already registered.</strong> Choose a new name for your device
                 <button type="button" class="close" data-hide="alert" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
@@ -145,10 +225,6 @@
                   <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kW)">
                   <label for="inputMinutes"> Minutes required to charge/use </label>
                   <input type="number" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
-                  <div class = "form-check">
-                    <input type="checkbox" class="form-check-input disabled-logout" id="submitCheck" disabled = "disabled">
-                    <label class="form-check-label" for="submitCheck">Register device</label>
-                  </div>
                   <label for="templateDevices">Select the period for charging/using:</label> <br>
                     <input type = "radio" name = "periodNew" value = "best24h" checked> 24 hours<br>
                     <input type = "radio" name = "periodNew" value = "best48h"> 48 hours<br>
@@ -156,7 +232,7 @@
               </form>
               <button type = "button" 
                         class = "btn btn-lg btn-block btn-outline-primary"
-                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value, document.getElementById('submitCheck').checked)"> Register</button>
+                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value, true)"> Register</button>
               </div>
           </div>
         </div>

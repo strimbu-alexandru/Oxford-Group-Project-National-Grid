@@ -1,4 +1,4 @@
-//Preventing redirect when submitting form, show success alert
+//Preventing redirects on form submittal
 $(function() {
     $("#revokePass").on("submit", function(e) {
         e.preventDefault();
@@ -13,7 +13,6 @@ $(function() {
     });
 });
 
-//Prevent redirect when submitting form, show success alert
 $(function() {
     $("#edit").on("submit", function(e) {
         e.preventDefault();
@@ -28,7 +27,6 @@ $(function() {
     });
 });
 
-//Prevent redirect when submitting form, show alers and repopulate list
 $(function() {
     $("#deleteAllDevices").on("submit", function(e) {
         e.preventDefault();
@@ -39,7 +37,7 @@ $(function() {
             success: function(data) {
                 $('#deleteAllAlert').show();
                 var el = document.getElementById('deviceList');
-                
+
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', 'userDevices/get', true);
                 xhr.onload = function() {
@@ -49,6 +47,8 @@ $(function() {
                 }
                 if(deviceList.length > 0){
                 //Reset the form
+
+
                 for(var i = 0; i<deviceList.length; i++){
                     var node = document.createElement('li');
                     node.className = "list-group-item";
@@ -62,15 +62,14 @@ $(function() {
                 var textContent = document.createTextNode("No devices currently registered!");
                 el.appendChild(textContent);
             }
-            }; 
+            };
             xhr.send();
 
              }
         });
     });
 });
-
-//Hide alerts when modal is closed
+//Hides alerts when modal is closed
 $(function(){
     $('#managePassModal').on('hide.bs.modal', function (e) {
      $('#revokeSuccessAlert').hide();
@@ -83,26 +82,44 @@ $(function(){
 $(function(){
     $("[data-hide]").on("click", function(){
         $("." + $(this).attr("data-hide")).hide();
+        // -or-, see below
+        // $(this).closest("." + $(this).attr("data-hide")).hide();
     });
 });
 
 
 var options =[{"text"  : "iPhone","value" : "iPhone", "power": "0.012", "minutes": "100"},
-    {"text"     : "Android","value"    : "Android",	"power":"0.015", "minutes":"90"},
-    {"text"  : "Custom","value" : "Custom", "power":"0", "minutes":"0"}
+    {"text"     : "Android","value"    : "Android", "power":"0.015", "minutes":"90"},
+    {"text"     : "Tesla",  "value"    : "Tesla",     "power":"120",   "minutes":"75"},
+    {"text"     : "Wahing machine", "value" : "Washing machine", "power": "0.5", "minutes" : "100"},
+    {"text"     : "Custom", "value" : "Custom",       "power":"0", "minutes":"0"}
     ];
 
 
-//Main function for scheduling
 function formsubmit(id, p=0, m=0, toDB = false){
+
     switch(id){
         case "template":
+            $("#registerSuccessAlert").hide();
+            $("#registerUsedAlert").hide();
             var vals = $('#templateDevices').val() || [];
             var listDevs = [];
 
             var p = options[vals[0]].power;
             var m = options[vals[0]].minutes;
-                $.ajax('./server/best24h/'+p+'/'+m, {
+            var radios = document.getElementsByName('periodTemplate');
+            
+            var api = ""
+
+                for (var i = 0, length = radios.length; i < length; i++)
+                {
+                    if (radios[i].checked)
+                    {
+                        api = radios[i].value
+                        break;
+                    }
+                }
+                $.ajax('./server/' + api + '/'+p+'/'+m, {
                 success: function(data) {
                 //listDevs.push({'data': data, 'm':m});
                 writeschedule(data, m);
@@ -112,25 +129,48 @@ function formsubmit(id, p=0, m=0, toDB = false){
             break;
 
         case "owndevice":
+            $("#registerSuccessAlert").hide();
+            $("#registerUsedAlert").hide();
+            var radios = document.getElementsByName('periodOwn');
+            
+            var api = ""
+
+                for (var i = 0, length = radios.length; i < length; i++)
+                {
+                    if (radios[i].checked)
+                    {
+                        api = radios[i].value
+                        break;
+                    }
+                }
             var vals = $.parseJSON($('#ownDevices option:selected').val());
-            /*var listDevs = [];
-            for(var i =0; i<vals.length; i++)
-            {*/
                 var p = vals.power;
                 var m = vals.minutes;
-                $.ajax('./server/best24h/'+p+'/'+m, {
+                $.ajax('./server/' + api + '/'+p+'/'+m, {
                 success: function(data) {
-                //listDevs.push({'data': data, 'm':m});
                 writeschedule(data, m);
             }
             }
             );
-            //}
-            //writeschedule(listDevs);
             break;
 
         case "newdevice":
+            $("#registerSuccessAlert").hide();
+                $("#registerUsedAlert").hide();
+                var radios = document.getElementsByName('periodNew');
+            
+            var api = ""
+
+                for (var i = 0, length = radios.length; i < length; i++)
+                {
+                    if (radios[i].checked)
+                    {
+                        api = radios[i].value
+                        break;
+                    }
+                }
             if(toDB){
+                $("#registerUsedAlert").show();
                 $("#custdata").submit(function(e) {
 
                 $.ajax({
@@ -139,7 +179,8 @@ function formsubmit(id, p=0, m=0, toDB = false){
                     data: $("#custdata").serialize(), // serializes the form's elements.
                     success: function(data)
                     {
-                        $("#registerSuccessAlert").show();
+                        if(data == "success")           //different messages for success or name already in use
+                            {$("#registerUsedAlert").hide(); $("#registerSuccessAlert").show()}
                     }
                     });
 
@@ -150,7 +191,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
             }
 
 
-            $.ajax('./server/best24h/'+p+'/'+m, {
+            $.ajax('./server/' + api + '/'+p+'/'+m, {
             success: function(data) {
                 //var listDevs = [{'data': data, 'm':m}];
                 writeschedule(data,m);
@@ -159,9 +200,6 @@ function formsubmit(id, p=0, m=0, toDB = false){
             break;
     }
 
-    // -----------------------------------------------------
-    //                  Chart drawing
-    //---------------------------------------------------------
     Chart.pluginService.register({
     beforeDraw: function (chart) {
         if (chart.config.options.elements.center) {
@@ -171,19 +209,19 @@ function formsubmit(id, p=0, m=0, toDB = false){
             //Get options from the center object in options
     var centerConfig = chart.config.options.elements.center;
     var fontStyle = centerConfig.fontStyle || 'Arial';
-    var texts = centerConfig.textsArray;
+    var txt1 = centerConfig.text1;
+    var txt2 = centerConfig.text2;
+    var txt3 = centerConfig.text3;
+    var txt4 = centerConfig.text4;
+    var txt5 = centerConfig.text5;
     var color = centerConfig.color || '#000';
     var sidePadding = centerConfig.sidePadding || 20;
     var sidePaddingCalculated = (sidePadding/100) * (chart.innerRadius * 2)
     //Start with a base font of 30px
     ctx.font = "30px " + fontStyle;
 
-    //Get the width of the string and also the width of the element minus 10 to give it 5px side padding
-    var stringWidth = 0;
-    for(var i = 0; i< texts.length; i++){
-        if(ctx.measureText(texts[i]).width > stringWidth)
-            stringWidth = ctx.measureText(texts[i]).width;
-    }
+            //Get the width of the string and also the width of the element minus 10 to give it 5px side padding
+    var stringWidth = ctx.measureText(txt1).width;
     var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
 
     // Find out how much the font can grow in width.
@@ -203,10 +241,11 @@ function formsubmit(id, p=0, m=0, toDB = false){
     ctx.fillStyle = color;
 
     //Draw text in center
-    var offset = 1;
-    for(var i = 0; i<texts.length; i++){
-        ctx.fillText(texts[i], centerX, centerY + (i + 1/2 - texts.length/2)*offset*fontSizeToUse);
-    }
+    ctx.fillText(txt1, centerX, centerY-(2.4)*fontSizeToUse);
+    ctx.fillText(txt2, centerX, centerY-(0.8)*fontSizeToUse);
+    ctx.fillText(txt3, centerX, centerY+0.8*fontSizeToUse);
+     ctx.fillText(txt4, centerX, centerY+2.4*fontSizeToUse);
+     ctx.fillText(txt5, centerX, centerY+4.0*fontSizeToUse);
         }
     }
 });
@@ -222,7 +261,6 @@ function writeschedule(data, m){
     var hours = m/60;
     var plugDate =data.data[0].plugInTime;
     var carbProd = data.data[0].carbonProduced;
-    var carbSaved = data.data[0].carbonReduced;
     carbProd = Math.round(carbProd * 100) / 100;
     var energy = data.data[0].energyConsumed;
     energy = Math.round(energy * 100) / 100;
@@ -259,7 +297,7 @@ function writeschedule(data, m){
     $('#resultsModal').modal('show');
 
     var ctx = document.getElementById('schedulerchart');
-    var schChart = new Chart(ctx,{
+        var schChart = new Chart(ctx,{
             type: 'doughnut',
             data: {
                 labels: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
@@ -302,12 +340,13 @@ function writeschedule(data, m){
                 },
                 elements: {
                     center: {
-                        textsArray: ["You should plug in at ",
-                                plugDateTime,
-                                "to use only " + Math.round(carbProd * energy * 100) / 100 + " g of carbon.",
-                                "You save " + Math.round(carbSaved) + " g by waiting."],
+                        text1: "You should plug in at ",
+                        text2: plugDateTime,
+                        text3: "Energy: " + energy + " kwh",
+                        text4: "Carbon: " + Math.round(carbProd * energy * 100) / 100 + " g",
+                        text5: "@ " + carbProd + " g/kwh",
                         fontStyle: 'Helvetica', // Default is Arial
-                         sidePadding: 10 // Defualt is 20 (as a percentage)
+                         sidePadding: 20 // Defualt is 20 (as a percentage)
                 }
             },
                 legend:{
@@ -420,7 +459,7 @@ function showElList(){
             }
         if(deviceList.length > 0){
             //Reset the form
-            
+
 
             for(var i = 0; i<deviceList.length; i++){
                 var node = document.createElement('li');
