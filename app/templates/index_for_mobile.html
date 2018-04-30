@@ -46,7 +46,7 @@
             <a class="nav-link" onclick="showElList()"> Manage devices</a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
-            <a class="nav-link" onclick="signOut()">Sign out</a>
+            <a class="nav-link" onclick="mobileSignOut()">Sign out</a>
         </li>
     </ul>
   </div>
@@ -242,7 +242,7 @@
 </div>
 
 <!-- Modal for mobile login -->
-<div class="modal bd-example-modal-lg" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -256,7 +256,7 @@
               <input type="text" class = "form-control" name='username' placeholder="Enter username">
               <label for="password"> Password </label>
               <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
-              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="submit" class="btn btn-primary mt-1">Login</button>
             </div>
           </form>
       </div>
