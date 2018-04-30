@@ -243,7 +243,7 @@
 
 <!-- Modal for mobile login -->
 <div class="modal" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title">Login</h3>
@@ -265,5 +265,47 @@
   </div>
 </div>
 
+<!-- Modal for managing charging slots -->
+<div class="modal" id="chargeManageModal" tabindex="-1" role="dialog" aria-labelleby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"> Charging slots</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body" id="chargeManageModalBody">
+        <div class="row">
+          <div class="col">
+            <!-- List of items -->
+          </div>
+          <div class="col border-left">
+            <!-- Register a new item -->
+            <h5> Register a new device. </h5>
+            <!-- Alert for successful registering of device -->
+              <div class="alert alert-success alert-dismissible" id="slotSuccessAlert" role="alert" style="display:none">
+                <strong>Device registered succesfully.</strong> You can now get reminders for this device.
+                <button type="button" class="close" data-hide="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form id = "chargeSlotAdd" action="chargingSlots/add" method="POST">
+                <div class = "form-group">
+                  <label for="inputName"> Device Name </label>
+                  <input type="text" class = "form-control" name='name' id='inputNameSlot' placeholder="Enter device name">
+                  <label for="inputPower"> Power </label>
+                  <input type="text" class = "form-control" name = 'consumption' id="inputPowerSlot" placeholder="Enter power (kW)">
+                  <label for="inputMinutes"> Minutes required to charge/use </label>
+                  <input type="number" class = "form-control" id="inputMinutesSlot" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
+                  <label for="templateDevices">Select the period for charging/using:</label> <br>
+                    <input type = "radio" name = "periodNew" value = "best24h" checked> 24 hours<br>
+                    <input type = "radio" name = "periodNew" value = "best48h"> 48 hours<br>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

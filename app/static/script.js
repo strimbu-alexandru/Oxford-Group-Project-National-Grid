@@ -555,3 +555,29 @@ $(function () {
     $('.offcanvas-collapse').toggleClass('open')
   })
 })
+
+function mobileSignOut() {
+
+    var logoutHandler = 'auth/logout'
+    
+    var signInButton = document.getElementById("signIn");
+    var loggedInElements = document.getElementsByClassName("view-loggedin");
+    var disabledElements = document.getElementsByClassName("disabled-logout");
+    signInButton.style.display="block";
+    for(var i = 0; i < loggedInElements.length; i++){
+        loggedInElements[i].style.display="none";
+    }
+
+    for(var i = 0; i < disabledElements.length; i++){
+        disabledElements[i].disabled=true;
+    }
+
+    // tell server to sign user out
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', logoutHandler);
+    xhr.onload = function() {
+      console.log(xhr.responseText);
+      jwToken='';
+    };
+    xhr.send();
+}
