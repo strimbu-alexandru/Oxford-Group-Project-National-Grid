@@ -28,6 +28,20 @@ $(function() {
 });
 
 $(function() {
+    $("#chargeSlotAdd").on("submit", function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr("action"),
+            type: 'post',
+            data: $(this).serialize(),
+            success: function(data) {
+                $('#slotSuccessAlert').show();
+             }
+        });
+    });
+});
+
+$(function() {
     $("#mobileLogin").on("submit", function(e) {
         e.preventDefault();
         $.ajax({
@@ -95,6 +109,20 @@ $(function() {
         });
     });
 });
+
+$(function() {
+    $("#deleteAllSlotDevices").on("submit", function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr("action"),
+            type: 'get',
+            data: $(this).serialize(),
+            success: function(data) {
+                showSlotList();
+             }
+        });
+    });
+});
 //Hides alerts when modal is closed
 $(function(){
     $('#managePassModal').on('hide.bs.modal', function (e) {
@@ -103,6 +131,19 @@ $(function(){
     });
 });
 
+$(function(){
+    $('#manageModal').on('hide.bs.modal', function (e) {
+     $('#deleteAllAlert').hide();
+    });
+});
+
+$(function(){
+    $('#resultsModal').on('hide.bs.modal', function (e) {
+     $('#registerSuccessAlert').hide();
+     $('#registerSlotAlert').hide();
+     $('#registeredUsedAlert').hide();
+    });
+});
 
 //Reusable alerts
 $(function(){
@@ -114,11 +155,11 @@ $(function(){
 });
 
 
-var options =[{"text"  : "iPhone","value" : "iPhone", "power": "0.012", "minutes": "100"},
-    {"text"     : "Android","value"    : "Android",	"power":"0.015", "minutes":"90"},
-    {"text"     : "Tesla",  "value"    : "Tesla",     "power":"120",   "minutes":"75"},
-    {"text"     : "Wahing machine", "value" : "Washing machine", "power": "0.5", "minutes" : "100"},
-    {"text"     : "Custom", "value" : "Custom",       "power":"0", "minutes":"0"}
+var options =[{"text"  : "iPhone","deviceName" : "iPhone", "consumption": "0.012", "timeToCharge": "100"},
+    {"text"     : "Android","deviceName"    : "Android",	"consumption":"0.015", "timeToCharge":"90"},
+    {"text"     : "Tesla",  "deviceName"    : "Tesla",     "consumption":"120",   "timeToCharge":"75"},
+    {"text"     : "Wahing machine", "deviceName" : "Washing machine", "consumption": "0.5", "timeToCharge" : "100"},
+    {"text"     : "Custom", "deviceName" : "Custom",       "consumption":"0", "timeToCharge":"0"}
     ];
 
 
@@ -131,8 +172,8 @@ function formsubmit(id, p=0, m=0, toDB = false){
             var vals = $('#templateDevices').val() || [];
             var listDevs = [];
 
-            var p = options[vals[0]].power;
-            var m = options[vals[0]].minutes;
+            var p = options[vals[0]].consumption;
+            var m = options[vals[0]].timeToCharge;
             var radios = document.getElementsByName('periodTemplate');
             
             var api = ""
@@ -148,7 +189,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
                 $.ajax('./server/' + api + '/'+p+'/'+m, {
                 success: function(data) {
                 //listDevs.push({'data': data, 'm':m});
-                writeschedule(data, m);
+                writeschedule(options[vals[0]], data, m);
             }
             }
             );
@@ -169,23 +210,25 @@ function formsubmit(id, p=0, m=0, toDB = false){
   						break;
  					}
 				}
-            var vals = $.parseJSON($('#ownDevices option:selected').val());
-                var p = vals.power;
-                var m = vals.minutes;
+
+                console.log($('#ownDevices option:selected').val());
+                var vals = $.parseJSON($('#ownDevices option:selected').val());
+                var p = vals.consumption;
+                var m = vals.timeToCharge;
                 $.ajax('./server/' + api + '/'+p+'/'+m, {
                 success: function(data) {
-                writeschedule(data, m);
+                writeschedule(vals, data, m);
             }
             }
             );
             break;
 
         case "newdevice":
-            $("#registerSuccessAlert").hide();
+                $("#registerSuccessAlert").hide();
 				$("#registerUsedAlert").hide();
 				var radios = document.getElementsByName('periodNew');
             
-            var api = ""
+                var api = "";
 
 				for (var i = 0, length = radios.length; i < length; i++)
 				{
@@ -195,7 +238,11 @@ function formsubmit(id, p=0, m=0, toDB = false){
   						break;
  					}
 				}
-            if(toDB){
+
+                console.log("Cust data serialised: ");
+                console.log($("#custdata").serialize());
+
+                if(toDB){
             	$("#registerUsedAlert").show();
                 $("#custdata").submit(function(e) {
 
@@ -220,7 +267,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
             $.ajax('./server/' + api + '/'+p+'/'+m, {
             success: function(data) {
                 //var listDevs = [{'data': data, 'm':m}];
-                writeschedule(data,m);
+                writeschedule($("#custdata").serialize(), data,m);
             }
             });
             break;
@@ -282,7 +329,7 @@ function setCharAt(str,index,chr) {
     return str.substr(0,index) + chr + str.substr(index+1);
 }
 
-function writeschedule(data, m){
+function writeschedule(device, data, m){
     //Calculate length of single charge
     var hours = m/60;
     var plugDate =data.data[0].plugInTime;
@@ -318,6 +365,36 @@ function writeschedule(data, m){
                 backgroundColors.push('green');
         }
 
+    var addButton = document.getElementById("addButton");
+    $('#inputSlotName').attr("value", device.deviceName);
+    $('#inputSlotPower').attr("value", device.consumption);
+    $('#inputSlotMinutes').attr("value" ,m);
+    $('#deviceId').attr("value", device.deviceId);
+    $('#inputSlotPlugIn').attr("value", plugDateTime.substring(0, 16));
+
+    console.log("Hidden form receives");
+    console.log(device);
+    console.log($('#hiddenForm').serialize());
+
+    addButton.onclick = function(){
+        $("#hiddenForm").submit(function(e) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "chargingSlots/add",
+                    data: $("#hiddenForm").serialize(), // serializes the form's elements.
+                    success: function(data)
+                    {
+                        if(data == "success")           //different messages for success or name already in use
+                            {$("#registerSlotAlert").show()}
+                    }
+                    });
+
+                 e.preventDefault(); // avoid to execute the actual submit of the form.
+                });
+
+        $("#hiddenForm").submit();
+    }
 
 
     $('#resultsModal').modal('show');
@@ -533,7 +610,7 @@ function loadOwnDevices(){
         for(var i = 0; i<deviceList.length; i++)
         {
             var node = document.createElement('option');
-            node.value = '{"id":' + i + ', "power":' + deviceList[i].consumption + ', "minutes":' + deviceList[i].timeToCharge + '}';
+            node.value = '{"id":' + i + ', "deviceName": "'+ deviceList[i].deviceName +'", "deviceId": '+ deviceList[i].deviceId + ', "consumption":' + deviceList[i].consumption + ', "timeToCharge":' + deviceList[i].timeToCharge + '}';
             node.innerHTML = deviceList[i].deviceName;
 
             el.appendChild(node);
@@ -559,7 +636,7 @@ $(function () {
 function mobileSignOut() {
 
     var logoutHandler = 'auth/logout'
-    
+
     var signInButton = document.getElementById("signIn");
     var loggedInElements = document.getElementsByClassName("view-loggedin");
     var disabledElements = document.getElementsByClassName("disabled-logout");
@@ -580,4 +657,58 @@ function mobileSignOut() {
       jwToken='';
     };
     xhr.send();
+}
+
+function showSlotList(){
+    var el = document.getElementById("slotList");
+    var deviceGet = 'chargingSlots/get/true';
+
+    var deviceList = [];
+
+    while (el.firstChild) {
+                el.removeChild(el.firstChild);
+            }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', deviceGet, true);
+    xhr.onload = function() {
+        deviceList = JSON.parse(xhr.response);
+        console.log(deviceList);
+        if(deviceList.length > 0){
+
+            for(var i = 0; i<deviceList.length; i++){
+                var node = document.createElement('li');
+                node.className = "list-group-item";
+                node.innerHTML = deviceList[i].deviceName + '<i class="js-remove">✖</i>';
+                node.value = i;
+                el.appendChild(node);
+            }
+        }
+        else
+        {
+            var textContent = document.createTextNode("No devices currently registered!");
+            el.appendChild(textContent);
+        }
+    };
+    xhr.send();
+
+    // Editable list
+    var editableList = Sortable.create(el, {
+    filter: '.js-remove',
+    onFilter: function (evt) {
+        var el = editableList.closest(evt.item); // get dragged item
+        var deviceDelete = 'chargingSlots/deleteAll';
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', deviceDelete + '/'+ deviceList[el.value].deviceId, true);
+        xhr.onload = function() {
+        };
+
+        xhr.send();
+        el && el.parentNode.removeChild(el);
+    }
+    });
+
+    $("#chargeManageModal").modal("show");
+
 }

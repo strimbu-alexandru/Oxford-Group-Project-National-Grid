@@ -56,17 +56,17 @@ class ChargingSlotMethods(Resource):
 # require plugInTime as a datetime string with format '%Y-%m-%d %H:%M'
 # if deviceId is null, need to supply the device details separately
 class AddChargingSlot(Resource):
-#    @login_required
+    @login_required
     def post(self):
-#        userId = getUserId()
-        user = User.query.filter(User.name == 'Tiffany Duneau').first()
-        userId = user.userId
+        userId = getUserId()
+       # user = User.query.filter(User.name == 'Tiffany Duneau').first()
+        #userId = user.userId
         # Get data from form
         plugInTime = datetime.strptime(request.form['plugInTime'], '%Y-%m-%d %H:%M')
         timeToCharge = int(request.form['timeToCharge'])
         deviceId = request.form['deviceId']
         deviceName = request.form['deviceName']
-        consumption = int(request.form['consumption'])
+        consumption = float(request.form['consumption'])
 
         if not deviceId == '': # if device is registered
             ChargingSlotMethods.addRegistered(userId, deviceId, plugInTime, timeToCharge)

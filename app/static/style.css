@@ -49,6 +49,28 @@
     opacity: 1;
   }
 
+#slotList {}
+  #slotList li {
+    position: relative;
+  }
+
+  #slotList i {
+    -webkit-transition: opacity .2s;
+    transition: opacity .2s;
+    opacity: 0;
+    display: block;
+    cursor: pointer;
+    color: #c00;
+    top: 10px;
+    right: 40px;
+    position: absolute;
+    font-style: normal;
+  }
+
+  #slotList li:hover i {
+    opacity: 1;
+  }
+
 /* For mobile */
 html,
 body {
@@ -99,4 +121,6 @@ body {
     opacity:0.7 !important;
 }
 
-
+select{
+  overflow-y: auto;
+}
