@@ -156,19 +156,19 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="resultsModalBody">
-        <div class="alert alert-success alert-dismissible" id="registerSuccessAlert" role="alert" style="display:none">
+        <div class="alert alert-success alert-dismissible mb-1 mt-1" id="registerSuccessAlert" role="alert" style="display:none">
       <strong>Device registered succesfully.</strong> You can now use this device as a template.
       <button type="button" class="close" data-hide="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="alert alert-success alert-dismissible" id="registerSlotAlert" role="alert" style="display:none">
+    <div class="alert alert-success alert-dismissible mb-1 mt-1" id="registerSlotAlert" role="alert" style="display:none">
       <strong>Charging slot registered. </strong> You can now see reminders for this device.
       <button type="button" class="close" data-hide="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="alert alert-danger alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
+    <div class="alert alert-danger alert-dismissible mb-1 mt-1" id="registerUsedAlert" role="alert" style="display:none">
       <strong>Device name already registered.</strong> Choose a new name for your device
       <button type="button" class="close" data-hide="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
@@ -201,7 +201,7 @@
       <form id = "deleteAllDevices" action="userDevices/deleteAll" method="GET">
       <button type="submit" class="btn btn-danger mt-1">Delete all</button>
       </form>
-      <div class="alert alert-success alert-dismissible" id="deleteAllAlert" role="alert" style="display:none">
+      <div class="alert alert-success alert-dismissible mb-1 mt-1" id="deleteAllAlert" role="alert" style="display:none">
       <strong>Device list cleared.</strong> All your devices have been removed from the database.
       <button type="button" class="close" data-hide="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
@@ -229,7 +229,7 @@
           <label for="password"> Password </label>
           <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
             <button type="submit" class="btn btn-primary mt-1">Submit</button>
-            <div class="alert alert-success alert-dismissible" id="editSuccessAlert" role="alert" style="display:none">
+            <div class="alert alert-success alert-dismissible mt-2" id="editSuccessAlert" role="alert" style="display:none">
             <strong>Username and password set.</strong> You can now log in on the mobile app.
             <button type="button" class="close" data-hide="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -241,7 +241,7 @@
       <form id = "revokePass" action="auth/mobile/login/remove" method="GET">
       <button type="submit" class="btn btn-danger">Revoke mobile password</button>
       </form>
-      <div class="alert alert-success alert-dismissible" id="revokeSuccessAlert" role="alert" style="display:none">
+      <div class="alert alert-success alert-dismissible mt-2" id="revokeSuccessAlert" role="alert" style="display:none">
       <strong>Password revoked.</strong> Session closed on the mobile app.
       <button type="button" class="close" data-hide="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
@@ -276,7 +276,7 @@
             <form id = "deleteAllSlotDevices" action="chargingSlots/deleteAll/all" method="GET">
             <button type="submit" class="btn btn-danger mt-1">Delete all</button>
             </form>
-            <div class="alert alert-success alert-dismissible" id="deleteAllSlotsAlert" role="alert" style="display:none">
+            <div class="alert alert-success alert-dismissible mt-2" id="deleteAllSlotsAlert" role="alert" style="display:none">
             <strong>Charging slots cleared.</strong> All your devices have been removed from the database.
             <button type="button" class="close" data-hide="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>

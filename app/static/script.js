@@ -285,11 +285,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
             //Get options from the center object in options
     var centerConfig = chart.config.options.elements.center;
     var fontStyle = centerConfig.fontStyle || 'Arial';
-    var txt1 = centerConfig.text1;
-    var txt2 = centerConfig.text2;
-    var txt3 = centerConfig.text3;
-    var txt4 = centerConfig.text4;
-    var txt5 = centerConfig.text5;
+    var texts = centerConfig.texts;
     var color = centerConfig.color || '#000';
     var sidePadding = centerConfig.sidePadding || 20;
     var sidePaddingCalculated = (sidePadding/100) * (chart.innerRadius * 2)
@@ -297,7 +293,12 @@ function formsubmit(id, p=0, m=0, toDB = false){
     ctx.font = "30px " + fontStyle;
 
             //Get the width of the string and also the width of the element minus 10 to give it 5px side padding
-    var stringWidth = ctx.measureText(txt1).width;
+    var stringWidth = 0;
+    for(var i = 0; i<texts.length; i++)
+    {
+        if(ctx.measureText(texts[i]).width > stringWidth)
+            stringWidth = ctx.measureText(texts[i]).width;
+    }
     var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
 
     // Find out how much the font can grow in width.
@@ -317,11 +318,9 @@ function formsubmit(id, p=0, m=0, toDB = false){
     ctx.fillStyle = color;
 
     //Draw text in center
-    ctx.fillText(txt1, centerX, centerY-(2.4)*fontSizeToUse);
-    ctx.fillText(txt2, centerX, centerY-(0.8)*fontSizeToUse);
-    ctx.fillText(txt3, centerX, centerY+0.8*fontSizeToUse);
-	 ctx.fillText(txt4, centerX, centerY+2.4*fontSizeToUse);
-	 ctx.fillText(txt5, centerX, centerY+4.0*fontSizeToUse);
+    for(var i = 0; i< texts.length; i++){
+        ctx.fillText(texts[i], centerX, centerY + (i  - (texts.length-1)/2)*fontSizeToUse);
+    }
         }
     }
 });
@@ -337,6 +336,7 @@ function writeschedule(device, data, m){
     var hours = m/60;
     var plugDate =data.data[0].plugInTime;
     var carbProd = data.data[0].carbonProduced;
+    var carbSaved = data.data[0].carbonReduced;
     carbProd = Math.round(carbProd * 100) / 100;
     var energy = data.data[0].energyConsumed;
     energy = Math.round(energy * 100) / 100;
@@ -446,13 +446,13 @@ function writeschedule(device, data, m){
                 },
                 elements: {
                     center: {
-                        text1: "You should plug in at ",
-                        text2: plugDateTime,
-                        text3: "Energy: " + energy + " kwh",
-                        text4: "Carbon: " + Math.round(carbProd * energy * 100) / 100 + " g",
-                        text5: "@ " + carbProd + " g/kwh",
+                        texts: ["You should plug in at ",
+                                plugDateTime,
+                                "to use only " + Math.round(carbProd * energy * 100) / 100 + " g of carbon.",
+                                "You save " + Math.round(carbSaved * 100)/100 + " g by waiting."
+                                ],
                         fontStyle: 'Helvetica', // Default is Arial
-                         sidePadding: 20 // Defualt is 20 (as a percentage)
+                         sidePadding: 10 // Defualt is 20 (as a percentage)
                 }
             },
                 legend:{
@@ -668,15 +668,14 @@ function showSlotList(){
 
     var deviceList = [];
 
-    while (el.firstChild) {
-                el.removeChild(el.firstChild);
-            }
-
     var xhr = new XMLHttpRequest();
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
         deviceList = JSON.parse(xhr.response);
-        console.log(deviceList);
+
+        while (el.firstChild) {
+                el.removeChild(el.firstChild);
+            }
         if(deviceList.length > 0){
 
             for(var i = 0; i<deviceList.length; i++){
