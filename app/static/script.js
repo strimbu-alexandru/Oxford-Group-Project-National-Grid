@@ -213,6 +213,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
 
                 console.log($('#ownDevices option:selected').val());
                 var vals = $.parseJSON($('#ownDevices option:selected').val());
+
                 var p = vals.consumption;
                 var m = vals.timeToCharge;
                 $.ajax('./server/' + api + '/'+p+'/'+m, {
@@ -267,7 +268,9 @@ function formsubmit(id, p=0, m=0, toDB = false){
             $.ajax('./server/' + api + '/'+p+'/'+m, {
             success: function(data) {
                 //var listDevs = [{'data': data, 'm':m}];
-                writeschedule($("#custdata").serialize(), data,m);
+                var deviceObject = $('#custdata').serializeArray().reduce(function(a, x) { a[x.name] = x.value; return a; }, {});
+
+                writeschedule(deviceObject, data,m);
             }
             });
             break;
@@ -369,11 +372,11 @@ function writeschedule(device, data, m){
     $('#inputSlotName').attr("value", device.deviceName);
     $('#inputSlotPower').attr("value", device.consumption);
     $('#inputSlotMinutes').attr("value" ,m);
-    $('#deviceId').attr("value", device.deviceId);
+    $('#deviceSlotId').attr("value", device.deviceId);
     $('#inputSlotPlugIn').attr("value", plugDateTime.substring(0, 16));
 
     console.log("Hidden form receives");
-    console.log(device);
+    console.log(device.deviceId);
     console.log($('#hiddenForm').serialize());
 
     addButton.onclick = function(){
@@ -680,7 +683,7 @@ function showSlotList(){
                 var node = document.createElement('li');
                 node.className = "list-group-item";
                 node.innerHTML = deviceList[i].deviceName + '<i class="js-remove">✖</i>';
-                node.value = i;
+                node.value = deviceList[i].slotId;
                 el.appendChild(node);
             }
         }
@@ -697,10 +700,10 @@ function showSlotList(){
     filter: '.js-remove',
     onFilter: function (evt) {
         var el = editableList.closest(evt.item); // get dragged item
-        var deviceDelete = 'chargingSlots/deleteAll';
+        var deviceDelete = 'chargingSlots/delete';
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', deviceDelete + '/'+ deviceList[el.value].deviceId, true);
+        xhr.open('GET', deviceDelete + '/'+ el.value, true);
         xhr.onload = function() {
         };
 
