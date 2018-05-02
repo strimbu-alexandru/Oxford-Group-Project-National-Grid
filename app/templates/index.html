@@ -43,10 +43,13 @@
             <div class="g-signin2"  data-onsuccess="onSignIn" style="display: inline-block;"></div>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
-            <a class="nav-link" href='#' onclick="showPassManager()"> Manage user profile</a>
+            <a class="nav-link" href='#' onclick="showPassManager()"> Manage mobile login </a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="showElList()"> Manage devices</a>
+        </li>
+        <li class="nav-item active view-loggedin" style="display:none">
+            <a class="nav-link" href="#" onclick="showSlotList()"> Charging slots </a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
@@ -58,8 +61,7 @@
 
     <div class = "container" id = "container">
 
-        <div id="titletext" class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-              <h2>Schedule a device</h2>
+        <div id="titletext" class="px-3 pt-md-3 pb-md-2 mx-auto text-center">
               <p class="lead">Quickly schedule optimal charging for a device from our templates or input your own custom data.</p>
         </div>
 
@@ -118,11 +120,15 @@
                     <form id = "custdata" action="userDevices/add" method="POST">
                         <div class = "form-group">
                             <label for="inputName"> Device Name </label>
-                            <input type="text" class = "form-control" name='name' id='inputName' placeholder="Enter device name">
+                            <input type="text" class = "form-control" name='deviceName' id='inputName' placeholder="Enter device name">
                             <label for="inputPower"> Power </label>
                             <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kW)">
                             <label for="inputMinutes"> Minutes required to charge/use </label>
                             <input type="number" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
+                            <div class = "form-check">
+                            <input type="checkbox" class="form-check-input disabled-logout" id="submitCheck" disabled = "disabled">
+                            <label class="form-check-label" for="submitCheck">Register device</label>
+                        </div>
                         <br>
                             <label for="templateDevices">Select the period for charging/using:</label> <br>
                             <input type = "radio" name = "periodNew" value = "best24h" checked> 24 hours<br>
@@ -134,7 +140,7 @@
             <div class='card-footer'>
                         <button type = "button" 
                         class = "btn btn-lg btn-block btn-outline-primary"
-                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value)"> Schedule</button>
+                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value, document.getElementById('submitCheck').checked)"> Schedule</button>
                         </div>
                 </div>
         </div>
@@ -146,25 +152,34 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">Results</h3>
+        <h4 class="modal-title">Results</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="resultsModalBody">
-        <div class="alert alert-success alert-dismissible" id="registerSuccessAlert" role="alert" style="display:none">
+        <div class="alert alert-success alert-dismissible mb-1 mt-1" id="registerSuccessAlert" role="alert" style="display:none">
       <strong>Device registered succesfully.</strong> You can now use this device as a template.
       <button type="button" class="close" data-hide="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="alert alert-success alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
+    <div class="alert alert-success alert-dismissible mb-1 mt-1" id="registerSlotAlert" role="alert" style="display:none">
+      <strong>Charging slot registered. </strong> You can now see reminders for this device.
+      <button type="button" class="close" data-hide="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="alert alert-danger alert-dismissible mb-1 mt-1" id="registerUsedAlert" role="alert" style="display:none">
       <strong>Device name already registered.</strong> Choose a new name for your device
       <button type="button" class="close" data-hide="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
       </button>
     </div>
         <div id="scedulerContainer">
-        <canvas id='schedulerchart' width='500' height='500'></canvas>
+        <canvas id='schedulerchart' width='450' height='450'></canvas>
       </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="addButton">Add to charging slots</button>
       </div>
     </div>
   </div>
@@ -175,124 +190,110 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">Manage devices</h3>
+        <h4 class="modal-title">Manage devices</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
-
       <div class="modal-body" id="manageModalBody">
-        <div class="container">
-          <div class="row">
-
-            <div class="col">
-              <h5> Delete devices here.</h5>
-              <ul class="list-group" id="deviceList">
-                <!-- Elements will be populated here -->
-              </ul>
-              <form class="pt-1" id = "deleteAllDevices" action="userDevices/deleteAll" method="GET">
-                <button type="submit" class="btn btn-danger">Delete all</button>
-              </form>
-              <div class="alert alert-success alert-dismissible" id="deleteAllAlert" role="alert" style="display:none">
-                <strong>Device list cleared.</strong> All your devices have been removed from the database.
-                <button type="button" class="close" data-hide="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="col border-left">
-              <h5> Register a new device. </h5>
-              <!-- Alert for successful scheduling of device -->
-              <div class="alert alert-success alert-dismissible" id="registerSuccessAlert" role="alert" style="display:none">
-                <strong>Device registered succesfully.</strong> You can now use this device as a template.
-                <button type="button" class="close" data-hide="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <!-- Device name duplicate alert -->
-              <div class="alert alert-danger alert-dismissible" id="registerUsedAlert" role="alert" style="display:none">
-                <strong>Device name already registered.</strong> Choose a new name for your device
-                <button type="button" class="close" data-hide="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-
-
-              <form id = "custdata" action="userDevices/add" method="POST">
-                <div class = "form-group">
-                  <label for="inputName"> Device Name </label>
-                  <input type="text" class = "form-control" name='name' id='inputName' placeholder="Enter device name">
-                  <label for="inputPower"> Power </label>
-                  <input type="text" class = "form-control" name = 'consumption' id="inputPower" placeholder="Enter power (kW)">
-                  <label for="inputMinutes"> Minutes required to charge/use </label>
-                  <input type="number" class = "form-control" id="inputMinutes" name = 'timeToCharge' placeholder="Enter minutes (1 - 450)" min = "1" max = "450">
-                  <label for="templateDevices">Select the period for charging/using:</label> <br>
-                    <input type = "radio" name = "periodNew" value = "best24h" checked> 24 hours<br>
-                    <input type = "radio" name = "periodNew" value = "best48h"> 48 hours<br>
-                  </div>
-              </form>
-              <button type = "button" 
-                        class = "btn btn-lg btn-block btn-outline-primary"
-                        onclick = "formsubmit ('newdevice', document.getElementById('inputPower').value, document.getElementById('inputMinutes').value, true)"> Register</button>
-              </div>
-          </div>
-        </div>
+        <h5> Delete devices here.</h5>
+        <ul class="list-group" id="deviceList">
+            <!-- Elements will be populated here -->
+        </ul>
+      <form id = "deleteAllDevices" action="userDevices/deleteAll" method="GET">
+      <button type="submit" class="btn btn-danger mt-1">Delete all</button>
+      </form>
+      <div class="alert alert-success alert-dismissible mb-1 mt-1" id="deleteAllAlert" role="alert" style="display:none">
+      <strong>Device list cleared.</strong> All your devices have been removed from the database.
+      <button type="button" class="close" data-hide="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Modal for managing mobile password -->
-<div class="modal bd-example-modal-lg" id="managePassModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+<div class="modal" id="managePassModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">Your profile</h3>
+        <h4 class="modal-title">Manage mobile password</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="manageModalBody">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-7">
-              <div class="media">
-                <img class="img-thumbnail" alt="User avatar" id = "userAvatar">
-                <div class="media-body" id="profileOptions">
-                  <h5 class="px-2"> Currently signed in as</h5>
-                </div>
-              </div>
-            </div>
+        <h5>Set a username and password for use on mobile:</h5>
+        <form  id = "edit" action="auth/mobile/login/edit" method="POST">
+        <div class = "form-group">
+          <label for="username"> Username </label>
+          <input type="text" class = "form-control" name='username' placeholder="Enter username">
+          <label for="password"> Password </label>
+          <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
+            <button type="submit" class="btn btn-primary mt-1">Submit</button>
+            <div class="alert alert-success alert-dismissible mt-2" id="editSuccessAlert" role="alert" style="display:none">
+            <strong>Username and password set.</strong> You can now log in on the mobile app.
+            <button type="button" class="close" data-hide="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          </div>
 
-            <div class="col-md-5 border-left">
-              <h5>Set a username and password for use on mobile:</h5>
-              <form  id = "edit" action="auth/mobile/login/edit" method="POST">
-              <div class = "form-group">
-                <label for="username"> Username </label>
-                <input type="text" class = "form-control" name='username' placeholder="Enter username">
-                <label for="password"> Password </label>
-                <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
-                  <button type="submit" class="btn btn-primary mt-2">Submit</button>
-                  <div class="alert alert-success alert-dismissible" id="editSuccessAlert" role="alert" style="display:none">
-                    <strong>Username and password set.</strong> You can now log in on the mobile app.
-                    <button type="button" class="close" data-hide="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                </div>
-              </form>
-              <form id = "revokePass" action="auth/mobile/login/remove" method="GET">
-               <button type="submit" class="btn btn-danger">Revoke mobile password</button>
-              </form>
-              <div class="alert alert-success alert-dismissible" id="revokeSuccessAlert" role="alert" style="display:none">
-                <strong>Password revoked.</strong> Session closed on the mobile app.
-                <button type="button" class="close" data-hide="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+      </form>
+      <form id = "revokePass" action="auth/mobile/login/remove" method="GET">
+      <button type="submit" class="btn btn-danger">Revoke mobile password</button>
+      </form>
+      <div class="alert alert-success alert-dismissible mt-2" id="revokeSuccessAlert" role="alert" style="display:none">
+      <strong>Password revoked.</strong> Session closed on the mobile app.
+      <button type="button" class="close" data-hide="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- Modal for managing charging slots -->
+<div class="modal" id="chargeManageModal" tabindex="-1" role="dialog" aria-labelleby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"> Charging slots</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body" id="chargeManageModalBody">
+        <div class="row">
+          <div class="col">
+              <div id="slotContainer">
+                <canvas id='slotchart' width='500' height='500'></canvas>
               </div>
-            </div>
+          </div>
+          <div class="col border-left">
+            <!-- List of items -->
+            <ul class="list-group" id="slotList">
+            <!-- Elements will be populated here -->
+            </ul>
+            <form id = "deleteAllSlotDevices" action="chargingSlots/deleteAll/all" method="GET">
+            <button type="submit" class="btn btn-danger mt-1">Delete all</button>
+            </form>
+            <div class="alert alert-success alert-dismissible mt-2" id="deleteAllSlotsAlert" role="alert" style="display:none">
+            <strong>Charging slots cleared.</strong> All your devices have been removed from the database.
+            <button type="button" class="close" data-hide="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
           </div>
         </div>
-     </div>
+      </div>
+      <form id="hiddenForm" action="chargingSlots/add" method="PUSH">
+                            <input type="hidden" class = "form-control" name='deviceName' id='inputSlotName'>
+                            <input type="hidden" class = "form-control" name = 'consumption' id="inputSlotPower">
+                            <input type="hidden" class = "form-control" id="inputSlotMinutes" name = 'timeToCharge'>
+                            <input type="hidden" class="form-control" id='deviceSlotId' name='deviceId'> 
+                            <input type="hidden" class="form-control" id='inputSlotPlugIn' name='plugInTime'>
+      </form>
+    </div>
   </div>
 </div>
 
 </body>
-</html>
+</html> 

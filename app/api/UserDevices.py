@@ -23,7 +23,7 @@ class AddUserDevices(Resource):						#add a new user device using the token to i
 	def post(self):
 		userId = getUserId()
 		#get the parameters from the form
-		deviceName = request.form['name']
+		deviceName = request.form['deviceName']
 		consumption = request.form['consumption']
 		timeToCharge = request.form['timeToCharge']
 		userDevice = UserDevice.query.filter(UserDevice.userId == userId, UserDevice.deviceName == deviceName).first()
@@ -76,4 +76,3 @@ api.add_resource(AddUserDevices, '/add')
 api.add_resource(GetUserDevices, '/get')
 api.add_resource(DeleteUserDevice, '/delete/<deviceName>')
 api.add_resource(DeleteAllUserDevices, '/deleteAll')
-
