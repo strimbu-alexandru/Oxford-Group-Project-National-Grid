@@ -250,6 +250,12 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="loginModalBody">
+          <div class="alert alert-success alert-danger" id="wrongPassAlert" role="alert" style="display:none">
+            <strong>Invalid username or password</strong> Your username or password was not recognised by the system.
+            <button type="button" class="close" data-hide="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
           <form id = "mobileLogin" action="/auth/mobile/login" method="POST">
             <div class = "form-group">
               <label for="username"> Username </label>
