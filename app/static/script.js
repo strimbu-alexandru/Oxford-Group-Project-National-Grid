@@ -643,7 +643,6 @@ function showSlotList(){
     var xhr = new XMLHttpRequest();
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
-        console.log(xhr.response);
         deviceList = JSON.parse(xhr.response);
 
         chargeSlotsVisualiser(deviceList);
@@ -839,7 +838,6 @@ function chargeSlotsVisualiser(deviceList){
 }
 
 function addSlot(){
-    console.log($('#inputSlotName').val());
     if($('#inputSlotName').val()){
         $("#hiddenForm").off();
         $("#hiddenForm").submit(function(e) {
@@ -848,13 +846,11 @@ function addSlot(){
                             url: "chargingSlots/add",
                             data: $("#hiddenForm").serialize(), // serializes the form's elements.
                             beforeSend: function(){
-                                console.log('BeforeSend running');
                                 document.getElementById('addButton').disabled=true;
                                 window.setTimeout(function(){}, 5);
                             },
                             success: function(data)
                             { 
-                                console.log("Function success.");
                                 if(data == "success")           //different messages for success or name already in use
                                     {$("#registerSlotAlert").show();
                                     $('#inputSlotName').attr("value", null);
