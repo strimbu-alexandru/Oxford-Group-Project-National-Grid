@@ -174,12 +174,18 @@
       <span aria-hidden="true">&times;</span>
       </button>
     </div>
+    <div class="alert alert-danger alert-dismissible mb-1 mt-1" id="doubleClickAlert" role="alert" style="display:none">
+      <strong>This device has already been added to your charging slots.</strong> You can reload this window to add a duplicate.
+      <button type="button" class="close" data-hide="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
         <div id="scedulerContainer">
         <canvas id='schedulerchart' width='450' height='450'></canvas>
       </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="addButton">Add to charging slots</button>
+        <button type="button" class="btn btn-primary" id="addButton" onclick="addSlot()">Add to charging slots</button>
       </div>
     </div>
   </div>

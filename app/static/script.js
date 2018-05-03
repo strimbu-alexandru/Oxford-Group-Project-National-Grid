@@ -141,6 +141,7 @@ $(function(){
      $('#registerSuccessAlert').hide();
      $('#registerSlotAlert').hide();
      $('#registeredUsedAlert').hide();
+     $('#doubleClickAlert').hide();
     });
 });
 
@@ -350,10 +351,19 @@ function writeschedule(device, data, m){
 
     //fakes numberCharging, I hope to get this from db
     for(var i = 0; i<24; i++){
-            if(i >= plugDateShort && i < unplugShort)
+            if(unplugShort <= 24){
+                if(i >= plugDateShort && i < unplugShort)
                 numberCharging.push(1);
             else
                 numberCharging.push(0);
+            }
+            else{
+                if(i >= plugDateShort || i < unplugShort-24)
+                    numberCharging.push(1);
+                else
+                numberCharging.push(0);
+            }                
+            
         }
 
         for(var i = 0; i<24; i++){
@@ -363,32 +373,11 @@ function writeschedule(device, data, m){
                 backgroundColors.push('green');
         }
 
-    var addButton = document.getElementById("addButton");
     $('#inputSlotName').attr("value", device.deviceName);
     $('#inputSlotPower').attr("value", device.consumption);
     $('#inputSlotMinutes').attr("value" ,m);
     $('#deviceSlotId').attr("value", device.deviceId);
     $('#inputSlotPlugIn').attr("value", plugDateTime.substring(0, 16));
-
-    $('#addButton').one('click', function(event){
-        $("#hiddenForm").submit(function(e) {
-                $.ajax({
-                    type: "POST",
-                    url: "chargingSlots/add",
-                    data: $("#hiddenForm").serialize(), // serializes the form's elements.
-                    success: function(data)
-                    {
-                        if(data == "success")           //different messages for success or name already in use
-                            {$("#registerSlotAlert").show()}
-                    }
-                    });
-
-                 e.preventDefault(); // avoid to execute the actual submit of the form.
-                });
-
-        $("#hiddenForm").submit();
-        $(this).off('click');
-    });
 
 
     $('#resultsModal').modal('show');
@@ -541,12 +530,11 @@ function showElList(){
         if(deviceList.length > 0){
             //Reset the form
 
-
             for(var i = 0; i<deviceList.length; i++){
                 var node = document.createElement('li');
                 node.className = "list-group-item";
                 node.innerHTML = deviceList[i].deviceName +'<i class="js-remove">✖</i>';
-                node.value = i;
+                node.value = deviceList[i].deviceName;
                 el.appendChild(node);
             }
         }
@@ -562,16 +550,19 @@ function showElList(){
     var editableList = Sortable.create(el, {
     filter: '.js-remove',
     onFilter: function (evt) {
-        var el = editableList.closest(evt.item); // get dragged item
+        var dragged = editableList.closest(evt.item); // get dragged item
         var deviceDelete = 'userDevices/delete';
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', deviceDelete + '/'+ deviceList[el.value].deviceName, true);
+        xhr.open('GET', deviceDelete + '/'+ dragged.innerHTML.split('<', 1)[0], true);
         xhr.onload = function() {
         };
 
         xhr.send();
-        el && el.parentNode.removeChild(el);
+
+        dragged && dragged.parentNode.removeChild(dragged);
+        event.stopPropagation()
+        evt.preventDefault();
     }
     });
 
@@ -589,6 +580,9 @@ function loadOwnDevices(){
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
         deviceList = JSON.parse(xhr.response);
+    //Clear form
+    while (el.firstChild) {
+    el.removeChild(el.firstChild);}
 
         //Populate the form with values
         for(var i = 0; i<deviceList.length; i++)
@@ -601,10 +595,6 @@ function loadOwnDevices(){
         }
     };
     xhr.send();
-
-    //Clear form
-    while (el.firstChild) {
-    el.removeChild(el.firstChild);}
 
 }
 
@@ -653,6 +643,7 @@ function showSlotList(){
     var xhr = new XMLHttpRequest();
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
+        console.log(xhr.response);
         deviceList = JSON.parse(xhr.response);
 
         chargeSlotsVisualiser(deviceList);
@@ -681,16 +672,19 @@ function showSlotList(){
     var editableList = Sortable.create(el, {
     filter: '.js-remove',
     onFilter: function (evt) {
-        var el = editableList.closest(evt.item); // get dragged item
+        var dragged = editableList.closest(evt.item); // get dragged item
         var deviceDelete = 'chargingSlots/delete';
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', deviceDelete + '/'+ el.value, true);
+        xhr.open('GET', deviceDelete + '/'+ dragged.value, true);
         xhr.onload = function() {
         };
 
         xhr.send();
-        el && el.parentNode.removeChild(el);
+        if(dragged.parentNode)
+            dragged && dragged.parentNode.removeChild(dragged);
+        event.stopPropagation();
+        evt.preventDefault();
     }
     });
 
@@ -759,8 +753,15 @@ function chargeSlotsVisualiser(deviceList){
             plugDate = plugDate.substring(0,plugDate.length-1);
             var plugDateShort = plugDate.split(":")[0];
             var unplugShort = 1*plugDateShort + deviceList[j].timeToCharge/60;
-            if(i >= plugDateShort && i < unplugShort)
+            if(unplugShort <= 24){
+                if(i >= plugDateShort && i < unplugShort)
                 count=count + 1;
+            }
+            else{
+                if(i >= plugDateShort || i < unplugShort-24)
+                    count = count + 1;
+            }
+            
         }
         numberCharging.push(count);
     }
@@ -835,4 +836,44 @@ function chargeSlotsVisualiser(deviceList){
                 cutoutPercentage: 75
             }
         });
+}
+
+function addSlot(){
+    console.log($('#inputSlotName').val());
+    if($('#inputSlotName').val()){
+        $("#hiddenForm").off();
+        $("#hiddenForm").submit(function(e) {
+                    $.ajax({
+                            type: "POST",
+                            url: "chargingSlots/add",
+                            data: $("#hiddenForm").serialize(), // serializes the form's elements.
+                            beforeSend: function(){
+                                console.log('BeforeSend running');
+                                document.getElementById('addButton').disabled=true;
+                                window.setTimeout(function(){}, 5);
+                            },
+                            success: function(data)
+                            { 
+                                console.log("Function success.");
+                                if(data == "success")           //different messages for success or name already in use
+                                    {$("#registerSlotAlert").show();
+                                    $('#inputSlotName').attr("value", null);
+                                    $('#inputSlotPower').attr("value", null);
+                                    $('#inputSlotMinutes').attr("value", null);
+                                    $('#deviceSlotId').attr("value", null);
+                                    $('#inputSlotPlugIn').attr("value", null);}
+                                    document.getElementById('addButton').disabled=false;
+                            }
+                            });
+                         
+                         e.stopPropagation();
+                         e.preventDefault(); // avoid to execute the actual submit of the form.
+                        });
+
+            $("#hiddenForm").submit();
+
+    }
+    else{
+        $('#doubleClickAlert').show();
+    }
 }
