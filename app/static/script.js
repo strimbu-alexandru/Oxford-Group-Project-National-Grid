@@ -49,19 +49,24 @@ $(function() {
             type: 'post',
             data: $(this).serialize(),
             success: function(data) {
-                console.log("Logged in.")
-                var signInButton = document.getElementById("signIn");
-                var loggedInElements = document.getElementsByClassName("view-loggedin");
-                var disabledElements = document.getElementsByClassName("disabled-logout");
-                signInButton.style.display="none";
-                for(var i = 0; i < loggedInElements.length; i++){
-                    loggedInElements[i].style.display="block";
+                console.log(data);
+                if(data == 'nosuchuser'){
+                    $("#wrongPassAlert").show();
                 }
+                else{
+                    var signInButton = document.getElementById("signIn");
+                    var loggedInElements = document.getElementsByClassName("view-loggedin");
+                    var disabledElements = document.getElementsByClassName("disabled-logout");
+                    signInButton.style.display="none";
+                    for(var i = 0; i < loggedInElements.length; i++){
+                        loggedInElements[i].style.display="block";
+                    }
 
-                for(var i = 0; i < disabledElements.length; i++){
-                    disabledElements[i].disabled=false;
+                    for(var i = 0; i < disabledElements.length; i++){
+                        disabledElements[i].disabled=false;
+                    }
+                    $("#loginModal").modal('hide');
                 }
-                $("#loginModal").modal('hide');
              }
         });
     });
@@ -134,6 +139,12 @@ $(function(){
 $(function(){
     $('#manageModal').on('hide.bs.modal', function (e) {
      $('#deleteAllAlert').hide();
+    });
+});
+
+$(function(){
+    $('#loginModal').on('hide.bs.modal', function (e) {
+     $('#wrongPassAlert').hide();
     });
 });
 
@@ -374,10 +385,6 @@ function writeschedule(device, data, m){
     $('#inputSlotMinutes').attr("value" ,m);
     $('#deviceSlotId').attr("value", device.deviceId);
     $('#inputSlotPlugIn').attr("value", plugDateTime.substring(0, 16));
-
-    console.log("Hidden form receives");
-    console.log(device.deviceId);
-    console.log($('#hiddenForm').serialize());
 
     addButton.onclick = function(){
         $("#hiddenForm").submit(function(e) {
