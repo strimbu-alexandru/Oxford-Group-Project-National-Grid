@@ -197,7 +197,7 @@ function formsubmit(id, p=0, m=0, toDB = false){
   						break;
  					}
 				}
-                $.ajax('./server/' + api + '/'+p+'/'+m, {
+                $.ajax('/server/' + api + '/'+p+'/'+m, {
                 success: function(data) {
                 //listDevs.push({'data': data, 'm':m});
                 writeschedule(options[vals[0]], data, m);
