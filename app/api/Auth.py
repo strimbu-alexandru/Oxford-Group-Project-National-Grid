@@ -102,7 +102,7 @@ class MobileLogin(Resource):
 			user = authMethods.findUserByUsername(username)
 			
 			if user == None:
-				return "nosuchuser"
+				return output_html(render_template("login_mobile.html",error = 'User not found - invalid username or password'),200)
 
 			if authMethods.authenticateByPassword(user,password):
 				authToken = authMethods.generateToken()				# Get the new token
@@ -116,7 +116,7 @@ class MobileLogin(Resource):
 
 				return 'Logged in as: ' + user.name
 
-		return "nosuchuser"
+		return MobileLogin.get(self)
 
 	def get(self):
 		# Send to mobile login page

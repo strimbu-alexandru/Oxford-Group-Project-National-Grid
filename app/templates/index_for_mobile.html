@@ -40,13 +40,13 @@
 
     <ul class="nav navbar-nav ml-auto">
         <li class="nav-item active" id="signIn">
-            <a class = "nav-link" data-toggle="modal" data-target="#loginModal" href = '#'> Mobile Login </a>
+            <a class = "nav-link" href = "auth/mobile/login"> Mobile Login </a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
-            <a class="nav-link" onclick="showElList()"> Manage devices</a>
+            <a class="nav-link" href="#" onclick="showElList()"> Manage devices</a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
-            <a class="nav-link" onclick="mobileSignOut()">Sign out</a>
+            <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
         </li>
     </ul>
   </div>
@@ -253,42 +253,12 @@
   </div>
 </div>
 
-<!-- Modal for mobile login -->
-<div class="modal" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Login</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-      </div>
-      <div class="modal-body" id="loginModalBody">
-          <div class="alert alert-success alert-danger" id="wrongPassAlert" role="alert" style="display:none">
-            <strong>Invalid username or password</strong> Your username or password was not recognised by the system.
-            <button type="button" class="close" data-hide="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <form id = "mobileLogin" action="/auth/mobile/login" method="POST">
-            <div class = "form-group">
-              <label for="username"> Username </label>
-              <input type="text" class = "form-control" name='username' placeholder="Enter username">
-              <label for="password"> Password </label>
-              <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
-              <button type="submit" class="btn btn-primary mt-1">Login</button>
-            </div>
-          </form>
-      </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Modal for managing charging slots -->
 <div class="modal" id="chargeManageModal" tabindex="-1" role="dialog" aria-labelleby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title"> Charging slots</h3>
+        <h4 class="modal-title"> Charging slots</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
       <div class="modal-body" id="chargeManageModalBody">
@@ -324,5 +294,6 @@
     </div>
   </div>
 </div>
+
 </body>
 </html>
