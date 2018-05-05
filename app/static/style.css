@@ -11,15 +11,15 @@
 }
 
 .canvas{
-	max-height: 100vh;
+  max-height: 100vh;
 }
 
 .card-img-top{
-	  max-width:60%;
- 	 max-height:60%;
-  	width: auto;
-  	height: auto;
-  	margin-left:20%;
+    max-width:60%;
+   max-height:60%;
+    width: auto;
+    height: auto;
+    margin-left:20%;
 }
 
 .donut-inner {

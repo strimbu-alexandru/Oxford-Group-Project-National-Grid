@@ -49,6 +49,7 @@ $(function() {
             type: 'post',
             data: $(this).serialize(),
             success: function(data) {
+              
                 console.log(data);
                 if(data == 'nosuchuser'){
                     $("#wrongPassAlert").show();
@@ -153,6 +154,7 @@ $(function(){
      $('#registerSuccessAlert').hide();
      $('#registerSlotAlert').hide();
      $('#registeredUsedAlert').hide();
+     $('#doubleClickAlert').hide();
     });
 });
 
@@ -222,7 +224,6 @@ function formsubmit(id, p=0, m=0, toDB = false){
  					}
 				}
 
-                console.log($('#ownDevices option:selected').val());
                 var vals = $.parseJSON($('#ownDevices option:selected').val());
 
                 var p = vals.consumption;
@@ -250,9 +251,6 @@ function formsubmit(id, p=0, m=0, toDB = false){
   						break;
  					}
 				}
-
-                console.log("Cust data serialised: ");
-                console.log($("#custdata").serialize());
 
                 if(toDB){
             	$("#registerUsedAlert").show();
@@ -366,10 +364,19 @@ function writeschedule(device, data, m){
 
     //fakes numberCharging, I hope to get this from db
     for(var i = 0; i<24; i++){
-            if(i >= plugDateShort && i < unplugShort)
+            if(unplugShort <= 24){
+                if(i >= plugDateShort && i < unplugShort)
                 numberCharging.push(1);
             else
                 numberCharging.push(0);
+            }
+            else{
+                if(i >= plugDateShort || i < unplugShort-24)
+                    numberCharging.push(1);
+                else
+                numberCharging.push(0);
+            }                
+            
         }
 
         for(var i = 0; i<24; i++){
@@ -379,32 +386,11 @@ function writeschedule(device, data, m){
                 backgroundColors.push('green');
         }
 
-    var addButton = document.getElementById("addButton");
     $('#inputSlotName').attr("value", device.deviceName);
     $('#inputSlotPower').attr("value", device.consumption);
     $('#inputSlotMinutes').attr("value" ,m);
     $('#deviceSlotId').attr("value", device.deviceId);
     $('#inputSlotPlugIn').attr("value", plugDateTime.substring(0, 16));
-
-    addButton.onclick = function(){
-        $("#hiddenForm").submit(function(e) {
-
-                $.ajax({
-                    type: "POST",
-                    url: "chargingSlots/add",
-                    data: $("#hiddenForm").serialize(), // serializes the form's elements.
-                    success: function(data)
-                    {
-                        if(data == "success")           //different messages for success or name already in use
-                            {$("#registerSlotAlert").show()}
-                    }
-                    });
-
-                 e.preventDefault(); // avoid to execute the actual submit of the form.
-                });
-
-        $("#hiddenForm").submit();
-    }
 
 
     $('#resultsModal').modal('show');
@@ -498,20 +484,12 @@ function onSignIn(googleUser) {
         disabledElements[i].disabled=false;
     }
 
-
-
-    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName());
-    console.log('Image URL: ' + profile.getImageUrl());
-    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-
     var id_token = googleUser.getAuthResponse().id_token;
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', loginHandler, true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xhr.onload = function() {
-        console.log(xhr.responseText);
         jwToken = xhr.responseText;
     };
     xhr.send('idtoken=' + id_token);
@@ -523,7 +501,6 @@ function signOut() {
 
     var auth2 = gapi.auth2.getAuthInstance();
                 auth2.signOut().then(function () {
-                    console.log('User signed out.');
                 });
     var signInButton = document.getElementById("signIn");
     var loggedInElements = document.getElementsByClassName("view-loggedin");
@@ -541,7 +518,6 @@ function signOut() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', logoutHandler);
     xhr.onload = function() {
-      console.log(xhr.responseText);
       jwToken='';
     };
     xhr.send();
@@ -567,12 +543,11 @@ function showElList(){
         if(deviceList.length > 0){
             //Reset the form
 
-
             for(var i = 0; i<deviceList.length; i++){
                 var node = document.createElement('li');
                 node.className = "list-group-item";
                 node.innerHTML = deviceList[i].deviceName +'<i class="js-remove">✖</i>';
-                node.value = i;
+                node.value = deviceList[i].deviceName;
                 el.appendChild(node);
             }
         }
@@ -588,16 +563,19 @@ function showElList(){
     var editableList = Sortable.create(el, {
     filter: '.js-remove',
     onFilter: function (evt) {
-        var el = editableList.closest(evt.item); // get dragged item
+        var dragged = editableList.closest(evt.item); // get dragged item
         var deviceDelete = 'userDevices/delete';
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', deviceDelete + '/'+ deviceList[el.value].deviceName, true);
+        xhr.open('GET', deviceDelete + '/'+ dragged.innerHTML.split('<', 1)[0], true);
         xhr.onload = function() {
         };
 
         xhr.send();
-        el && el.parentNode.removeChild(el);
+
+        dragged && dragged.parentNode.removeChild(dragged);
+        event.stopPropagation()
+        evt.preventDefault();
     }
     });
 
@@ -615,6 +593,9 @@ function loadOwnDevices(){
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
         deviceList = JSON.parse(xhr.response);
+    //Clear form
+    while (el.firstChild) {
+    el.removeChild(el.firstChild);}
 
         //Populate the form with values
         for(var i = 0; i<deviceList.length; i++)
@@ -627,10 +608,6 @@ function loadOwnDevices(){
         }
     };
     xhr.send();
-
-    //Clear form
-    while (el.firstChild) {
-    el.removeChild(el.firstChild);}
 
 }
 
@@ -663,7 +640,6 @@ function mobileSignOut() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', logoutHandler);
     xhr.onload = function() {
-      console.log(xhr.responseText);
       jwToken='';
     };
     xhr.send();
@@ -675,10 +651,14 @@ function showSlotList(){
 
     var deviceList = [];
 
+    $("#chargeManageModal").modal("show");
+  
     var xhr = new XMLHttpRequest();
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
         deviceList = JSON.parse(xhr.response);
+
+        chargeSlotsVisualiser(deviceList);
 
         while (el.firstChild) {
                 el.removeChild(el.firstChild);
@@ -705,19 +685,208 @@ function showSlotList(){
     var editableList = Sortable.create(el, {
     filter: '.js-remove',
     onFilter: function (evt) {
-        var el = editableList.closest(evt.item); // get dragged item
+      
+        var dragged = editableList.closest(evt.item); // get dragged item
         var deviceDelete = 'chargingSlots/delete';
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', deviceDelete + '/'+ el.value, true);
+        xhr.open('GET', deviceDelete + '/'+ dragged.value, true);
+
         xhr.onload = function() {
         };
 
         xhr.send();
-        el && el.parentNode.removeChild(el);
+      
+        if(dragged.parentNode)
+            dragged && dragged.parentNode.removeChild(dragged);
+        event.stopPropagation();
+        evt.preventDefault();
     }
     });
 
-    $("#chargeManageModal").modal("show");
+    //Register chart?
+    Chart.pluginService.register({
+    beforeDraw: function (chart) {
+        if (chart.config.options.elements.center) {
+    //Get ctx from string
+    var ctx = chart.chart.ctx;
 
+            //Get options from the center object in options
+    var centerConfig = chart.config.options.elements.center;
+    var fontStyle = centerConfig.fontStyle || 'Arial';
+    var texts = centerConfig.texts;
+    var color = centerConfig.color || '#000';
+    var sidePadding = centerConfig.sidePadding || 20;
+    var sidePaddingCalculated = (sidePadding/100) * (chart.innerRadius * 2)
+    //Start with a base font of 30px
+    ctx.font = "30px " + fontStyle;
+
+            //Get the width of the string and also the width of the element minus 10 to give it 5px side padding
+    var stringWidth = 0;
+    for(var i = 0; i<texts.length; i++)
+    {
+        if(ctx.measureText(texts[i]).width > stringWidth)
+            stringWidth = ctx.measureText(texts[i]).width;
+    }
+    var elementWidth = (chart.innerRadius * 2) - sidePaddingCalculated;
+
+    // Find out how much the font can grow in width.
+    var widthRatio = elementWidth / stringWidth;
+    var newFontSize = Math.floor(30 * widthRatio);
+    var elementHeight = (chart.innerRadius * 2);
+
+    // Pick a new font size so it will not be larger than the height of label.
+    var fontSizeToUse = Math.min(newFontSize, elementHeight);
+
+            //Set font settings to draw it correctly.
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    var centerX = ((chart.chartArea.left + chart.chartArea.right) / 2);
+    var centerY = ((chart.chartArea.top + chart.chartArea.bottom) / 2);
+    ctx.font = fontSizeToUse+"px " + fontStyle;
+    ctx.fillStyle = color;
+
+    //Draw text in center
+    for(var i = 0; i< texts.length; i++){
+        ctx.fillText(texts[i], centerX, centerY + (i  - (texts.length-1)/2)*fontSizeToUse);
+    }
+        }
+    }
+});
+
+
+}
+
+function chargeSlotsVisualiser(deviceList){
+    var numberCharging = [];
+    var backgroundColors = [];
+
+    for(var i = 0; i<24; i++){
+        var count = 0;
+        for(var j = 0; j<deviceList.length; j++){
+            var plugDate = deviceList[j].plugInTime;
+            plugDate = plugDate.split(" ").pop();
+            plugDate = plugDate.substring(0,plugDate.length-1);
+            var plugDateShort = plugDate.split(":")[0];
+            var unplugShort = 1*plugDateShort + deviceList[j].timeToCharge/60;
+            if(unplugShort <= 24){
+                if(i >= plugDateShort && i < unplugShort)
+                count=count + 1;
+            }
+            else{
+                if(i >= plugDateShort || i < unplugShort-24)
+                    count = count + 1;
+            }
+            
+        }
+        numberCharging.push(count);
+    }
+
+
+    for(var i = 0; i<24; i++){
+        switch(numberCharging[i]){
+            case 0: backgroundColors.push('LightGray'); break;
+            case 1: backgroundColors.push('MediumSeaGreen'); break;
+            case 2: backgroundColors.push('ForestGreen'); break;
+            default: backgroundColors.push('DarkGreen'); break;
+        }
+    }
+
+
+    var ctx1 = document.getElementById('slotchart');
+
+    var schChart = new Chart(ctx1,{
+        type: 'doughnut',
+        data: {
+            labels: ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+            datasets: [{
+                label: '',
+                data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                backgroundColor: backgroundColors,},
+                {
+                label: '',
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    backgroundColor: backgroundColors,}
+                ]
+            },
+            options: {
+                tooltips: {
+                    callbacks: {
+                            title: function(tooltipItem, data){
+                                return data['labels'][tooltipItem[0]['index']];
+                            },
+                            label: function(tooltipItem, data){
+                                var number = numberCharging[tooltipItem.index];
+                                var text;
+                                if(number == 1)
+                                    text = ' device charging at this time.';
+                                else
+                                    text = ' devices charging at this time.';
+                                return number + text;
+                            }
+                    }
+                },
+                elements: {
+                    center: {
+                        texts: ["You have " + deviceList.length + " devices scheduled",
+                                "for the next 24 hours.",
+                                "Hover to see exact plugin times."
+                                ],
+                        fontStyle: 'Helvetica', // Default is Arial
+                         sidePadding: 10 // Defualt is 20 (as a percentage)
+                }
+            },
+                legend:{
+                    display: false
+                },
+                layout: {
+                    padding: {
+                        left: 0,
+                        right: 0,
+                        top: 15,
+                        bottom: 0
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                cutoutPercentage: 75
+            }
+        });
+}
+
+function addSlot(){
+    if($('#inputSlotName').val()){
+        $("#hiddenForm").off();
+        $("#hiddenForm").submit(function(e) {
+                    $.ajax({
+                            type: "POST",
+                            url: "chargingSlots/add",
+                            data: $("#hiddenForm").serialize(), // serializes the form's elements.
+                            beforeSend: function(){
+                                document.getElementById('addButton').disabled=true;
+                                window.setTimeout(function(){}, 5);
+                            },
+                            success: function(data)
+                            { 
+                                if(data == "success")           //different messages for success or name already in use
+                                    {$("#registerSlotAlert").show();
+                                    $('#inputSlotName').attr("value", null);
+                                    $('#inputSlotPower').attr("value", null);
+                                    $('#inputSlotMinutes').attr("value", null);
+                                    $('#deviceSlotId').attr("value", null);
+                                    $('#inputSlotPlugIn').attr("value", null);}
+                                    document.getElementById('addButton').disabled=false;
+                            }
+                            });
+                         
+                         e.stopPropagation();
+                         e.preventDefault(); // avoid to execute the actual submit of the form.
+                        });
+
+            $("#hiddenForm").submit();
+
+    }
+    else{
+        $('#doubleClickAlert').show();
+    }
 }

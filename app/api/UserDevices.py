@@ -76,4 +76,3 @@ api.add_resource(AddUserDevices, '/add')
 api.add_resource(GetUserDevices, '/get')
 api.add_resource(DeleteUserDevice, '/delete/<deviceName>')
 api.add_resource(DeleteAllUserDevices, '/deleteAll')
-
