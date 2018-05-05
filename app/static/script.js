@@ -49,18 +49,25 @@ $(function() {
             type: 'post',
             data: $(this).serialize(),
             success: function(data) {
-                var signInButton = document.getElementById("signIn");
-                var loggedInElements = document.getElementsByClassName("view-loggedin");
-                var disabledElements = document.getElementsByClassName("disabled-logout");
-                signInButton.style.display="none";
-                for(var i = 0; i < loggedInElements.length; i++){
-                    loggedInElements[i].style.display="block";
+              
+                console.log(data);
+                if(data == 'nosuchuser'){
+                    $("#wrongPassAlert").show();
                 }
+                else{
+                    var signInButton = document.getElementById("signIn");
+                    var loggedInElements = document.getElementsByClassName("view-loggedin");
+                    var disabledElements = document.getElementsByClassName("disabled-logout");
+                    signInButton.style.display="none";
+                    for(var i = 0; i < loggedInElements.length; i++){
+                        loggedInElements[i].style.display="block";
+                    }
 
-                for(var i = 0; i < disabledElements.length; i++){
-                    disabledElements[i].disabled=false;
+                    for(var i = 0; i < disabledElements.length; i++){
+                        disabledElements[i].disabled=false;
+                    }
+                    $("#loginModal").modal('hide');
                 }
-                $("#loginModal").modal('hide');
              }
         });
     });
@@ -133,6 +140,12 @@ $(function(){
 $(function(){
     $('#manageModal').on('hide.bs.modal', function (e) {
      $('#deleteAllAlert').hide();
+    });
+});
+
+$(function(){
+    $('#loginModal').on('hide.bs.modal', function (e) {
+     $('#wrongPassAlert').hide();
     });
 });
 
@@ -639,13 +652,14 @@ function showSlotList(){
     var deviceList = [];
 
     $("#chargeManageModal").modal("show");
-
+  
     var xhr = new XMLHttpRequest();
     xhr.open('GET', deviceGet, true);
     xhr.onload = function() {
         deviceList = JSON.parse(xhr.response);
 
         chargeSlotsVisualiser(deviceList);
+
         while (el.firstChild) {
                 el.removeChild(el.firstChild);
             }
@@ -671,15 +685,18 @@ function showSlotList(){
     var editableList = Sortable.create(el, {
     filter: '.js-remove',
     onFilter: function (evt) {
+      
         var dragged = editableList.closest(evt.item); // get dragged item
         var deviceDelete = 'chargingSlots/delete';
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', deviceDelete + '/'+ dragged.value, true);
+
         xhr.onload = function() {
         };
 
         xhr.send();
+      
         if(dragged.parentNode)
             dragged && dragged.parentNode.removeChild(dragged);
         event.stopPropagation();
