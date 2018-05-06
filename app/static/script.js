@@ -49,22 +49,35 @@ $(function() {
             type: 'post',
             data: $(this).serialize(),
             success: function(data) {
-                var signInButton = document.getElementById("signIn");
-                var loggedInElements = document.getElementsByClassName("view-loggedin");
-                var disabledElements = document.getElementsByClassName("disabled-logout");
-                signInButton.style.display="none";
-                for(var i = 0; i < loggedInElements.length; i++){
-                    loggedInElements[i].style.display="block";
-                }
+                console.log(data);
+                if(data == 'nosuchuser'){
+                    $("#wrongPassAlert").show();
+                 }
+                else{
+                    var signInButton = document.getElementById("signIn");
+                    var loggedInElements = document.getElementsByClassName("view-loggedin");
+                    var disabledElements = document.getElementsByClassName("disabled-logout");
+                    signInButton.style.display="none";
+                    for(var i = 0; i < loggedInElements.length; i++){
+                        loggedInElements[i].style.display="block";
 
+                }
                 for(var i = 0; i < disabledElements.length; i++){
                     disabledElements[i].disabled=false;
                 }
                 $("#loginModal").modal('hide');
              }
+         }
         });
     });
 });
+
+$(function(){
+    $('#loginModal').on('hide.bs.modal', function (e) {
+     $('#wrongPassAlert').hide();
+    });
+});
+
 
 $(function() {
     $("#deleteAllDevices").on("submit", function(e) {
@@ -263,10 +276,9 @@ function formsubmit(id, p=0, m=0, toDB = false){
 
             $.ajax('./server/' + api + '/'+p+'/'+m, {
             success: function(data) {
-                //var listDevs = [{'data': data, 'm':m}];
                 var deviceObject = $('#custdata').serializeArray().reduce(function(a, x) { a[x.name] = x.value; return a; }, {});
 
-                writeschedule(deviceObject, data,m);
+                writeschedule(deviceObject, data, m);
             }
             });
             break;
@@ -372,13 +384,12 @@ function writeschedule(device, data, m){
             else
                 backgroundColors.push('green');
         }
-
+    $('#readyToWrite').attr("value", true);
     $('#inputSlotName').attr("value", device.deviceName);
     $('#inputSlotPower').attr("value", device.consumption);
     $('#inputSlotMinutes').attr("value" ,m);
     $('#deviceSlotId').attr("value", device.deviceId);
     $('#inputSlotPlugIn').attr("value", plugDateTime.substring(0, 16));
-
 
     $('#resultsModal').modal('show');
 
@@ -838,7 +849,7 @@ function chargeSlotsVisualiser(deviceList){
 }
 
 function addSlot(){
-    if($('#inputSlotName').val()){
+    if($('#readyToWrite').val()){
         $("#hiddenForm").off();
         $("#hiddenForm").submit(function(e) {
                     $.ajax({
@@ -847,17 +858,13 @@ function addSlot(){
                             data: $("#hiddenForm").serialize(), // serializes the form's elements.
                             beforeSend: function(){
                                 document.getElementById('addButton').disabled=true;
-                                window.setTimeout(function(){}, 5);
+                                window.setTimeout(function(){}, 10);
                             },
                             success: function(data)
                             { 
                                 if(data == "success")           //different messages for success or name already in use
                                     {$("#registerSlotAlert").show();
-                                    $('#inputSlotName').attr("value", null);
-                                    $('#inputSlotPower').attr("value", null);
-                                    $('#inputSlotMinutes').attr("value", null);
-                                    $('#deviceSlotId').attr("value", null);
-                                    $('#inputSlotPlugIn').attr("value", null);}
+                                    $('#readyToWrite').attr("value", null);}
                                     document.getElementById('addButton').disabled=false;
                             }
                             });

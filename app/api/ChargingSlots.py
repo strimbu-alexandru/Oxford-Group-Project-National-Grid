@@ -20,15 +20,15 @@ def getUserId():
 # For use internally to the backend:
 class ChargingSlotMethods(Resource):
     # Add a new charging slot for the user and registered device
-    def addRegistered(userId, deviceId, plugInTime, timeToCharge):
-        chargingSlot = ChargingSlot(deviceId = deviceId, userId = userId, plugInTime = plugInTime, timeToCharge = timeToCharge)
+    def addRegistered(userId, deviceId, deviceName, consumption, plugInTime, timeToCharge):
+        chargingSlot = ChargingSlot(deviceId = deviceId, userId = userId, deviceName = deviceName, consumption = consumption, plugInTime = plugInTime, timeToCharge = timeToCharge)
         db_session.add(chargingSlot)
         db_session.commit()
         return chargingSlot
 
     # Add a charging slot for the user and unregistered device
     def addUnregistered(userId, deviceName, consumption, plugInTime, timeToCharge):
-        chargingSlot = ChargingSlot(userId = userId, deviceName = deviceName, consumption = consumption,plugInTime = plugInTime, timeToCharge = timeToCharge)
+        chargingSlot = ChargingSlot(userId = userId, deviceName = deviceName, consumption = consumption, plugInTime = plugInTime, timeToCharge = timeToCharge)
         db_session.add(chargingSlot)
         db_session.commit()
         return chargingSlot
@@ -59,8 +59,6 @@ class AddChargingSlot(Resource):
     @login_required
     def post(self):
         userId = getUserId()
-       # user = User.query.filter(User.name == 'Tiffany Duneau').first()
-        #userId = user.userId
         # Get data from form
         plugInTime = datetime.strptime(request.form['plugInTime'], '%Y-%m-%d %H:%M')
         timeToCharge = int(request.form['timeToCharge'])
@@ -69,8 +67,12 @@ class AddChargingSlot(Resource):
         consumption = float(request.form['consumption'])
 
         if not deviceId == '': # if device is registered
-            ChargingSlotMethods.addRegistered(userId, deviceId, plugInTime, timeToCharge)
-            return 'success'
+            # Find the device and get the info.
+            device = UserDevice.query.filter(UserDevice.deviceId == deviceId).first()
+            if device:
+                ChargingSlotMethods.addRegistered(userId, deviceId, device.deviceName, device.consumption, plugInTime, timeToCharge)
+                return 'success'
+            return 'invalid device id['
         ChargingSlotMethods.addUnregistered(userId, deviceName, consumption, plugInTime, timeToCharge)
         return 'success'
 

@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang = "en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="google-signin-client_id" content="395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleusercontent.com">
-	<title>National Grid Eco-scheduler</title>
+  <title>National Grid Eco-scheduler</title>
 
-	<!-- bootstrap -->
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!-- bootstrap -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
 
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-	<script src ="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+  <script src ="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
      <script type="text/javascript" src="{{url_for('.static', filename='script.js')}}"></script>
@@ -28,7 +28,7 @@
 <body>
 
 <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
-  <a class="navbar-brand" href="/">Eco-Scheduler</a>
+  <a class="navbar-brand" href="/index.html">Eco-Scheduler</a>
 
   <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
         <span class="navbar-toggler-icon"></span>
@@ -36,14 +36,17 @@
 
 
       <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
-	
+
 
     <ul class="nav navbar-nav ml-auto">
         <li class="nav-item active" id="signIn">
-            <a class = "nav-link" href = "auth/mobile/login"> Mobile Login </a>
+            <a class = "nav-link" data-toggle="modal" data-target="#loginModal" href = '#'> Mobile Login </a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="showElList()"> Manage devices</a>
+        </li>
+        <li class="nav-item active view-loggedin" style="display:none">
+            <a class="nav-link" href="#" onclick="showSlotList()"> Charging slots </a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="signOut()">Sign out</a>
@@ -212,44 +215,33 @@
   </div>
 </div>
 
-<!-- Modal for managing mobile password -->
-<div class="modal" id="managePassModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- Modal for mobile login -->
+<div class="modal" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Manage mobile password</h4>
+        <h3 class="modal-title">Login</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
       </div>
-      <div class="modal-body" id="manageModalBody">
-        <h5>Set a username and password for use on mobile:</h5>
-        <form  id = "edit" action="auth/mobile/login/edit" method="POST">
-        <div class = "form-group">
-          <label for="username"> Username </label>
-          <input type="text" class = "form-control" name='username' placeholder="Enter username">
-          <label for="password"> Password </label>
-          <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
-            <button type="submit" class="btn btn-primary mt-1">Submit</button>
-            <div class="alert alert-success alert-dismissible mt-2" id="editSuccessAlert" role="alert" style="display:none">
-            <strong>Username and password set.</strong> You can now log in on the mobile app.
+      <div class="modal-body" id="loginModalBody">
+          <div class="alert alert-success alert-danger" id="wrongPassAlert" role="alert" style="display:none">
+            <strong>Invalid username or password</strong> Your username or password was not recognised by the system.
             <button type="button" class="close" data-hide="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          </div>
-
-      </form>
-      <form id = "revokePass" action="auth/mobile/login/remove" method="GET">
-      <button type="submit" class="btn btn-danger">Revoke mobile password</button>
-      </form>
-      <div class="alert alert-success alert-dismissible mt-2" id="revokeSuccessAlert" role="alert" style="display:none">
-      <strong>Password revoked.</strong> Session closed on the mobile app.
-      <button type="button" class="close" data-hide="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-      </button>
+          <form id = "mobileLogin" action="/auth/mobile/login" method="POST">
+            <div class = "form-group">
+              <label for="username"> Username </label>
+              <input type="text" class = "form-control" name='username' placeholder="Enter username">
+              <label for="password"> Password </label>
+              <input type="password" class = "form-control" name = 'password' placeholder="Enter password">
+              <button type="submit" class="btn btn-primary mt-1">Login</button>
+            </div>
+          </form>
+      </div>
+      </div>
     </div>
-
-    </div>
-  </div>
   </div>
 </div>
 
@@ -290,10 +282,11 @@
                             <input type="hidden" class = "form-control" id="inputSlotMinutes" name = 'timeToCharge'>
                             <input type="hidden" class="form-control" id='deviceSlotId' name='deviceId'> 
                             <input type="hidden" class="form-control" id='inputSlotPlugIn' name='plugInTime'>
+                            <input type="hidden" class="form-control" id='readyToWrite' name='readyToWrite'>
       </form>
     </div>
   </div>
 </div>
 
 </body>
-</html>
+</html> 
