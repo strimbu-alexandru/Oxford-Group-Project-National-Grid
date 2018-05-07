@@ -69,7 +69,7 @@ class ChargingSlot (Base, DictSerializable):
 	userId = Column(String(128), ForeignKey('users.userId'))
 	deviceId = Column(Integer, ForeignKey('userDevices.deviceId'))		# Can be null if device is not registered
 	deviceName = Column(Integer)										# Fill these columns for
-	consumption = Column(Integer)										# unregistered devices only
+	consumption = Column(Integer)										# unregistered devices
 	plugInTime = Column(DateTime)
 	timeToCharge = Column(Integer)
 

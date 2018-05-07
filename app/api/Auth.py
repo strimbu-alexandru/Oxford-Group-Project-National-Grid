@@ -26,7 +26,7 @@ def login_required(f):
 	def decorated_function(*args, **kwargs):
 		if isAuthenticated():
 			return f(*args, **kwargs)
-		return redirect(url_for('Auth.login'))
+		return "Not logged in"
 
 	return decorated_function
 

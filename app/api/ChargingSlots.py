@@ -21,7 +21,7 @@ def getUserId():
 class ChargingSlotMethods(Resource):
     # Add a new charging slot for the user and registered device
     def addRegistered(userId, deviceId, deviceName, consumption, plugInTime, timeToCharge):
-        chargingSlot = ChargingSlot(deviceId = deviceId, userId = userId, deviceName = deviceName, consumption = consumption, plugInTime = plugInTime, timeToCharge = timeToCharge)
+        chargingSlot = ChargingSlot(userId = userId, deviceId = deviceId, deviceName = deviceName, consumption = consumption, plugInTime = plugInTime, timeToCharge = timeToCharge)
         db_session.add(chargingSlot)
         db_session.commit()
         return chargingSlot
@@ -60,21 +60,24 @@ class AddChargingSlot(Resource):
     def post(self):
         userId = getUserId()
         # Get data from form
-        plugInTime = datetime.strptime(request.form['plugInTime'], '%Y-%m-%d %H:%M')
-        timeToCharge = int(request.form['timeToCharge'])
         deviceId = request.form['deviceId']
         deviceName = request.form['deviceName']
         consumption = float(request.form['consumption'])
+        plugInTime = datetime.strptime(request.form['plugInTime'], '%Y-%m-%d %H:%M')
+        timeToCharge = int(request.form['timeToCharge'])
 
-        if not deviceId == '': # if device is registered
+        if deviceId != '': # if device is registered
             # Find the device and get the info.
-            device = UserDevice.query.filter(UserDevice.deviceId == deviceId).first()
-            if device:
-                ChargingSlotMethods.addRegistered(userId, deviceId, device.deviceName, device.consumption, plugInTime, timeToCharge)
+            device = UserDevice.query.filter(UserDevice.deviceId == deviceId, UserDevice.userId == userId).first()
+            if not device:
+                return "Device not found or does not belong to user"
+            else:
+                ChargingSlotMethods.addRegistered(userId, deviceId, deviceName, consumption, plugInTime, timeToCharge)
                 return 'success'
-            return 'invalid device id['
-        ChargingSlotMethods.addUnregistered(userId, deviceName, consumption, plugInTime, timeToCharge)
-        return 'success'
+        else:
+            ChargingSlotMethods.addUnregistered(userId, deviceName, consumption, plugInTime, timeToCharge)
+            return 'success'
+
 
 # returns all charging slots for the user that are scheduled for the future
 # future: defaults to TRUE - specifies whether to get all slots ever or just upcoming ones
@@ -82,10 +85,9 @@ class GetChargingSlots(Resource):
     @login_required
     def get(self, future=True):
         userId = getUserId()
-        if future:
-            chargingSlots = ChargingSlot.query.filter(ChargingSlot.userId == userId, ChargingSlot.plugInTime > datetime.now()).all()
-        else:
-            chargingSlots = ChargingSlot.query.filter(ChargingSlot.userId == userId).all()
+
+        # for now just returns all of them
+        chargingSlots = ChargingSlot.query.filter(ChargingSlot.userId == userId).all()
 
         # Serialise the charging slots returned.
         def dictify(ChargingSlot):
