@@ -11,7 +11,8 @@ Auth = Blueprint('Auth',__name__, url_prefix='/auth', template_folder='templates
 api = Api(Auth)
 
 # Client ID to authenticate with google
-CLIENT_ID = '395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleusercontent.com'	#team10 account
+# CLIENT_ID = '395319603732-s2ictf4jgnfj5c7ra1dm64oatnrmebqf.apps.googleusercontent.com'	#team10 account (only links to pythonanywhere and localhost:5000
+CLIENT_ID = '321008678947-odoo1nacn7sc32er56ja0jn2d965eaj2.apps.googleusercontent.com'		#tiffany's account
 
 # For rendering the webpages
 def output_html(data, code, headers=None):
