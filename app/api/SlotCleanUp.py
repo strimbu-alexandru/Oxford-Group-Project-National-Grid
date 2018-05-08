@@ -6,10 +6,10 @@ from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from app.api.Scheduling import schedulingMethods
-from app.Models import User, UserDevice, ChargingSlot
+from app.Models import ChargingSlot
 from app.Database import db_session
 
-
+# Start scheduler and register the jobs.
 def initScheduler():
     # Get the scheduler
     scheduler = BackgroundScheduler()
@@ -41,17 +41,20 @@ class slotCleanUp():
         # Get all the charging slots
         allSlots = ChargingSlot.query.all()
 
-        # For each slot check its still optimal and update if not
+        # For each slot check it's still optimal and update if not
         for slot in allSlots:
             # Currently always looks ahead 24 hours.
             result = schedulingMethods.bestTimeSlot(24, slot.consumption, slot.timeToCharge)
             optPlugInTime = datetime.strptime(result['data'][0]['plugInTime'], '%Y-%m-%dT%H:%MZ')
             # Check if optimal time is later than current optimal time
             if optPlugInTime > slot.plugInTime:
+                slotCleanUp.content.append(
+                    'Slot ' + str(slot.slotId) + ' updated from ' +
+                    str(slot.plugInTime) + ' to ' + str(optPlugInTime)
+                )
                 # Update slot to reflect new time
                 slot.plugInTime = optPlugInTime
                 db_session.commit()
-                slotCleanUp.content.append(str(slot.slotId) + ' updated.')
 
 
 # Define api for checking clean up logs:
@@ -62,4 +65,10 @@ class getLogs(Resource):
     def get(self):
         return slotCleanUp.content
 
+class forceCleanUp(Resource):
+    def get(self):
+        slotCleanUp.cleanUp()
+        return getLogs.get(self)
+
 api.add_resource(getLogs, '/')
+api.add_resource(forceCleanUp, '/force')
