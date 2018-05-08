@@ -21,7 +21,7 @@
      <script type="text/javascript" src="{{url_for('.static', filename='script.js')}}"></script>
 
     <link rel="stylesheet" type="text/css" href="{{url_for('.static', filename='style.css')}}">
-    
+
     <link rel="icon" type="image/png" sizes="16x16" href="{{url_for('.static', filename='favicon-16.png')}}">
 
 
@@ -49,6 +49,9 @@
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="showSlotList()"> Charging slots </a>
+        </li>
+        <li class="nav-item active" id="aboutLink">
+            <a class = "nav-link" data-toggle="modal" data-target="#aboutModal" href = '#'> About </a>
         </li>
         <li class="nav-item active view-loggedin" style="display:none">
             <a class="nav-link" href="#" onclick="mobileSignOut()">Sign out</a>
@@ -289,6 +292,38 @@
       </form>
     </div>
   </div>
+</div>
+</div>
+
+<!-- About modal -->
+<div class="modal" id="aboutModal" tabindex="-1" role="dialog" aria-labelleby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"> About </h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+      </div>
+      <div class="modal-body" id="aboutModalBody">
+        <h4> Why charge at a certain time? </h4>
+        <p> The electricity running on the grid is produced by different sources, whose shares vary during the day. National Grid balances the amounts taken from renewable energy sources, nuclear plants and coal/petrol-based plants based on supply and demand. Therefore, using electricity when it is mostly from green sources will have a smaller carbon footprint and will tell National Grid that there is more of a demand for green energy.</p>
+        <h4> What is a carbon footprint? </h4>
+        <p> Carbon, mainly in the form of its dioxide CO2, plays a crucial role in global warming by acting as a greenhouse gas. It has been calculated that to prevent global warming from reaching uncontrollable levels, we must drastically reduce the amount of CO2 that we produce.</p> 
+        <h4> How are these numbers calculated? </h4>
+        <p> We use National Grid's Carbon Intensity API that provides data on the carbon footprint on the grid at the moment and makes predictions for the next 48 hours based on their projections about the availability of different sources and consumer supply/demand.</p>
+        <h4> About us </h4>
+        We are Team 10, comprised of:
+        <ul>
+          <li> Alexandru Strimbu </li>
+          <li> Tiffany Duneau </li>
+          <li> Denitsa Markova </li>
+          <li> Zhenxian Yang </li>
+          <li> Jan Bialas </li>
+          <li> Zihang Lai.</li>
+        </ul>
+        This project was developed with the support and guidance of National Grid, the Environmental Defense Action Fund, WWF and our academic sponsor, Prof. Alex Rogers.
+    </div>
+  </div>
+</div>
 </div>
 
 </body>
