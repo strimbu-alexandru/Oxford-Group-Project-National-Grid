@@ -380,9 +380,9 @@ function writeschedule(device, data, m){
 
         for(var i = 0; i<24; i++){
             if(numberCharging[i]<1)
-                backgroundColors.push('gray');
+                backgroundColors.push('LightGray');
             else
-                backgroundColors.push('green');
+                backgroundColors.push('ForestGreen');
         }
     $('#readyToWrite').attr("value", true);
     $('#inputSlotName').attr("value", device.deviceName);
@@ -402,11 +402,13 @@ function writeschedule(device, data, m){
                     label: '',
                     data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     backgroundColor: backgroundColors,
+                    hoverBackgroundColor: backgroundColors,
                 },
                     {
                     label: '',
                     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     backgroundColor: backgroundColors,
+                    hoverBackgroundColor: backgroundColors,
                 }
                 ]
             },
@@ -417,21 +419,22 @@ function writeschedule(device, data, m){
                                 return data['labels'][tooltipItem[0]['index']];
                             },
                             label: function(tooltipItem, data){
+                            },
+                            afterLabel: function(tooltipItem, data){
+                                var texts = [];
                                 var number = numberCharging[tooltipItem.index];
                                 var text;
                                 if(number == 1)
                                     text = ' device charging at this time.';
                                 else
                                     text = ' devices charging at this time.';
-                                return number + text;
-                            },
-                            afterLabel: function(tooltipItem, data){
-                                var text = '';
+                                text = number + text;
+                                texts.push(text);
                                 if(tooltipItem.index == plugDateShort){
-                                    text = "Plug in your device at ";
-                                    text = text + plugDate + ".";
+                                    text = "Plug in your device at " + plugDate + ".";
+                                    texts.push(text);
                                 }
-                                return text;
+                                return texts;
                             }
                     }
                 },
@@ -693,6 +696,7 @@ function showSlotList(){
         xhr.send();
         if(dragged.parentNode)
             dragged && dragged.parentNode.removeChild(dragged);
+        showSlotList();
         event.stopPropagation();
         evt.preventDefault();
     }
@@ -754,9 +758,11 @@ function showSlotList(){
 function chargeSlotsVisualiser(deviceList){
     var numberCharging = [];
     var backgroundColors = [];
+    var deviceNames = [];
 
     for(var i = 0; i<24; i++){
         var count = 0;
+        deviceNames.push([]);
         for(var j = 0; j<deviceList.length; j++){
             var plugDate = deviceList[j].plugInTime;
             plugDate = plugDate.split(" ").pop();
@@ -765,12 +771,18 @@ function chargeSlotsVisualiser(deviceList){
             var unplugShort = 1*plugDateShort + deviceList[j].timeToCharge/60;
             if(unplugShort <= 24){
                 if(i >= plugDateShort && i < unplugShort)
+                {
                 count=count + 1;
+                deviceNames[i].push(deviceList[j].deviceName);
+                }
             }
             else{
-                if(i >= plugDateShort || i < unplugShort-24)
+                if(i >= plugDateShort || i < unplugShort-24){
                     count = count + 1;
+                    deviceNames[i].push(deviceList[j].deviceName);
+                }
             }
+
             
         }
         numberCharging.push(count);
@@ -796,11 +808,13 @@ function chargeSlotsVisualiser(deviceList){
             datasets: [{
                 label: '',
                 data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                backgroundColor: backgroundColors,},
+                backgroundColor: backgroundColors,
+                hoverBackgroundColor: backgroundColors},
                 {
                 label: '',
                     data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                    backgroundColor: backgroundColors,}
+                    backgroundColor: backgroundColors,
+                    hoverBackgroundColor: backgroundColors,}
                 ]
             },
             options: {
@@ -809,15 +823,21 @@ function chargeSlotsVisualiser(deviceList){
                             title: function(tooltipItem, data){
                                 return data['labels'][tooltipItem[0]['index']];
                             },
-                            label: function(tooltipItem, data){
+                            label: function(tooltipItem, data){},
+                            afterLabel: function(tooltipItem, data){
+                                var labeltext = [];
                                 var number = numberCharging[tooltipItem.index];
                                 var text;
                                 if(number == 1)
-                                    text = ' device charging at this time.';
+                                    text = ' device charging at this time';
                                 else
-                                    text = ' devices charging at this time.';
-                                return number + text;
-                            }
+                                    text = ' devices charging at this time';
+                                labeltext.push(number + text);
+                                for(var i = 0; i<deviceNames[tooltipItem.index].length; i++){
+                                    labeltext.push(deviceNames[tooltipItem.index][i]);
+                                }
+                                return labeltext;
+                            },
                     }
                 },
                 elements: {
