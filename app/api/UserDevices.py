@@ -28,8 +28,8 @@ class AddUserDevices(Resource):						#add a new user device using the token to i
 		timeToCharge = request.form['timeToCharge']
 		userDevice = UserDevice.query.filter(UserDevice.userId == userId, UserDevice.deviceName == deviceName).first()
 		if userDevice != None :
-		    return "used"
-		userDevices = UserDevice(userId = userId, deviceName = deviceName, consumption = consumption, timeToCharge = timeToCharge)		#if user is valid, proceed to enter it into the user database
+			return "used"
+		userDevices = UserDevice(userId = userId, deviceName = deviceName, consumption = consumption, timeToCharge = timeToCharge)
 		db_session.add(userDevices)
 		db_session.commit()
 		return "success"

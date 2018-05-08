@@ -26,12 +26,18 @@ from app.api.Auth import Auth
 from app.api.Scheduling import Scheduling
 from app.api.UserDevices import UserDevices
 from app.api.ChargingSlots import ChargingSlots
+from app.api.SlotCleanUp import SlotCleanUp
 
 app.register_blueprint(Index)
 app.register_blueprint(Auth)
 app.register_blueprint(Scheduling)
 app.register_blueprint(UserDevices)
 app.register_blueprint(ChargingSlots)
+app.register_blueprint(SlotCleanUp)
+
+# Scheduler for async things
+from app.api.SlotCleanUp import initScheduler
+initScheduler()
 
 # Register custom error handler with app
 from app.ErrorHandler import CustomError
