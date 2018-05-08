@@ -22,7 +22,7 @@ def initScheduler():
     # Add slot clean up job to scheduler
     scheduler.add_job(
         func = slotCleanUp.cleanUp,
-        trigger = IntervalTrigger(start_date=start, seconds=30),
+        trigger = IntervalTrigger(start_date=start, minutes=30),
         id = 'slot_cleanup',
         name = 'Refresh Slots',
         replace_existing = True)
