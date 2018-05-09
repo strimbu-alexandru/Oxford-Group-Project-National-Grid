@@ -13,7 +13,6 @@ from app.Database import db_session
 def initScheduler():
     # Get the scheduler
     scheduler = BackgroundScheduler()
-    scheduler.start()
 
     # Find the next perfect half hour to start the slot clean up on
     from datetime import datetime, timedelta
@@ -29,6 +28,8 @@ def initScheduler():
 
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
+
+    scheduler.start()
 
 
 # Function to be called every half hour. Passes through all slots and updates as necessary.

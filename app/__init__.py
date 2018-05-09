@@ -35,10 +35,6 @@ app.register_blueprint(UserDevices)
 app.register_blueprint(ChargingSlots)
 app.register_blueprint(SlotCleanUp)
 
-# Scheduler for async things
-from app.api.SlotCleanUp import initScheduler
-initScheduler()
-
 # Register custom error handler with app
 from app.ErrorHandler import CustomError
 
@@ -47,3 +43,7 @@ def handle_custom_error(error):
 	response = jsonify(error.to_dict())
 	response.status_code = error.status_code
 	return response
+
+# Scheduler for async things
+from app.api.SlotCleanUp import initScheduler
+initScheduler()
